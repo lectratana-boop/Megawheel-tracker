@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Megawheel Tracker PRO</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background:#eef1f5;
+    padding:10px;
+}
+
+.container {
+    max-width:500px;
+    margin:auto;
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+}
+
+h2 {text-align:center;}
+
+select {
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+}
+
+.btn {
+    width:32%;
+    padding:12px;
+    margin:5px 1%;
+    border:none;
+    border-radius:8px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 4px 0 rgba(0,0,0,0.2);
+}
+
+.btn:active {transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,0.2);} 
+
+.add {background:#28a745;}
+.pred {background:#007bff;}
+.chart {background:#ffc107; color:black;}
+.reset {background:#dc3544;}
+
+.box {
+    background:#f7f9fb;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.pattern {
+    background:#ffcc66;
+    padding:5px 8px;
+    border-radius:6px;
+    margin:3px;
+    display:inline-block;
+}
+
+.small {font-size:12px;}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🎯 Megawheel Tracker PRO</h2>
+
+<select id="numero">
+<option value="">Choisir numéro</option>
+<option>1</option><option>2</option><option>5</option><option>8</option>
+<option>10</option><option>15</option><option>20</option>
+<option>30</option><option>40</option>
+</select>
+
+<button class="btn add" onclick="ajouter()">➕ Ajouter</button>
+<button class="btn pred" onclick="prediction()">🔍 Prédiction</button>
+<button class="btn chart" onclick="simulation()">📊 Simulation</button>
+
+<button class="btn reset" style="width:100%" onclick="resetData()">🗑 Reset</button>
+
+<div class="box">
+<h3>Historique :</h3>
+<div id="historique"></div>
+</div>
+
+<div class="box">
+<h3>Résumé :</h3>
+<div id="resume"></div>
+</div>
+
+<div class="box">
+<h3>Top 10 Patterns :</h3>
+<div id="patterns"></div>
+</div>
+
+<div class="box">
+<h3>Statistiques :</h3>
+<div id="stats"></div>
+</div>
+
+<div class="box">
+<h3>🤖 Prédiction automatique :</h3>
+<div id="prediction"></div>
+</div>
+
+</div>
+
+<script>
+let valeurs=[1,2,5,8,10,15,20,30,40];
+let resultats=JSON.parse(localStorage.getItem("res"))||[];
+let patterns=JSON.parse(localStorage.getItem("pat"))||{};
+
+function save(){
+ localStorage.setItem("res",JSON.stringify(resultats));
+ localStorage.setItem("pat",JSON.stringify(patterns));
+}
+
+function ajouter(){
+ let n=document.getElementById("numero").value;
+ if(!n) return;
+ resultats.push(parseInt(n));
+ if(resultats.length>20) resultats.shift();
+ update();
+}
+
+function update(){
+ document.getElementById("historique").innerText=resultats.join(" - ");
+
+ let freq={};
+ resultats.forEach(n=>freq[n]=(freq[n]||0)+1);
+
+ let max=null,min=null;
+ for(let n in freq){
+  if(max==null||freq[n]>freq[max]) max=n;
+  if(min==null||freq[n]<freq[min]) min=n;
+ }
+
+ let last4="";
+ if(resultats.length>=4){
+  last4=resultats.slice(-4).join("-");
+  patterns[last4]=(patterns[last4]||0)+1;
+ }
+
+ let totalP=Object.values(patterns).reduce((a,b)=>a+b,0);
+ let freqP=patterns[last4]?((patterns[last4]/totalP)*100).toFixed(1):0;
+
+ document.getElementById("resume").innerHTML=`+Freq: ${max} (${freq[max]||0}) | -Freq: ${min} (${freq[min]||0})<br>Pattern: ${last4} (${freqP}%)`;
+
+ // TOP 10
+ let sorted=Object.entries(patterns).sort((a,b)=>b[1]-a[1]).slice(0,10);
+ let html="";
+ sorted.forEach(p=>{
+  let perc=((p[1]/totalP)*100).toFixed(1);
+  html+=`<div class='pattern'>${p[0]} ${p[1]} (${perc}%)</div>`;
+ });
+ document.getElementById("patterns").innerHTML=html;
+
+ // stats
+ document.getElementById("stats").innerHTML=`Plus fréquent: ${max} | Moins fréquent: ${min}`;
+
+ save();
+}
+
+function prediction(){
+ let freq={};
+ resultats.forEach(n=>freq[n]=(freq[n]||0)+1);
+
+ let sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+ let best=sorted[0]?sorted[0][0]:"-";
+ let worst=sorted[sorted.length-1]?sorted[sorted.length-1][0]:"-";
+
+ let bestPattern=Object.entries(patterns).sort((a,b)=>b[1]-a[1])[0];
+
+ document.getElementById("prediction").innerHTML=`Probable: ${best}<br>En retard: ${worst}<br>Pattern: ${bestPattern?bestPattern[0]:"-"}`;
+}
+
+function simulation(){
+ for(let i=0;i<1000;i++){
+  let r=valeurs[Math.floor(Math.random()*valeurs.length)];
+  resultats.push(r);
+ }
+ update();
+ alert("Simulation 1000 tours ajoutée");
+}
+
+function resetData(){
+ if(confirm("Supprimer données ?")){
+  localStorage.clear();
+  location.reload();
+ }
+}
+
+update();
+</script>
+
+</body>
+</html>
