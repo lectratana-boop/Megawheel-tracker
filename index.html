@@ -8,99 +8,115 @@
 <style>
 body {
   font-family: Arial;
-  background: #f5f7fa;
   text-align: center;
+  background: #f5f7fa;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
 }
 
 h1 {
   color: #2c3e50;
 }
 
-.container {
-  max-width: 800px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
 button {
-  margin: 5px;
-  padding: 10px 15px;
-  border: none;
+  margin: 3px;
+  padding: 8px 12px;
   border-radius: 8px;
+  border: none;
   cursor: pointer;
   font-weight: bold;
   box-shadow: 0 4px #999;
 }
 
 button:active {
-  box-shadow: 0 2px #666;
   transform: translateY(2px);
+  box-shadow: 0 2px #666;
 }
 
-.normal {
+.btn-normal {
   background: #3498db;
   color: white;
 }
 
-.jackpot {
+.btn-jackpot {
   background: #e67e22;
   color: white;
+}
+
+.actions button {
+  margin-top: 10px;
+  background: #2ecc71;
+  color: white;
+}
+
+.reset {
+  background: #e74c3c;
 }
 
 #history {
   margin-top: 15px;
   font-size: 14px;
+  word-wrap: break-word;
 }
 
-.table {
-  margin-top: 20px;
+table {
   width: 100%;
+  margin-top: 20px;
   border-collapse: collapse;
 }
 
-.table th, .table td {
+th, td {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-.table th {
+th {
   background: #2c3e50;
   color: white;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="container">
+
 <h1>Megawheel Tracker PRO</h1>
 
 <h3>Choisir numéro</h3>
 <div id="buttons"></div>
 
-<button onclick="addResult()">+ Ajouter</button>
-<button onclick="resetData()">Reset</button>
+<div class="actions">
+  <button onclick="addResult()">+ Ajouter</button>
+  <button class="reset" onclick="resetData()">Reset</button>
+</div>
 
 <div id="history"></div>
 
-<table class="table" id="stats">
+<table>
 <thead>
 <tr>
 <th>Numéro</th>
 <th>Fréquence</th>
 </tr>
 </thead>
-<tbody></tbody>
+<tbody id="stats"></tbody>
 </table>
 
 </div>
 
 <script>
 
-// Multiplicateurs
+// NUMEROS
+const numbers = [1,2,5,8,10,15,20,30,40];
+
+// MULTIPLIERS (ton tableau)
 const multipliers = {
   1: [5,8,25,88,100],
   2: [8,25,88,100,200],
@@ -114,76 +130,91 @@ const multipliers = {
 };
 
 let current = null;
-let history = JSON.parse(localStorage.getItem('history')) || [];
+let history = JSON.parse(localStorage.getItem("history")) || [];
 
-// Générer boutons
-function createButtons(){
-  const container = document.getElementById('buttons');
-  container.innerHTML = '';
+// CREER BOUTONS
+function createButtons() {
+  let container = document.getElementById("buttons");
+  container.innerHTML = "";
 
-  for(let num in multipliers){
-    
+  numbers.forEach(num => {
+
     // bouton normal
-    let btn = document.createElement('button');
+    let btn = document.createElement("button");
     btn.innerText = num;
-    btn.className = 'normal';
-    btn.onclick = ()=> select(num);
+    btn.className = "btn-normal";
+    btn.onclick = () => selectNumber(num);
     container.appendChild(btn);
 
     // boutons jackpot
-    multipliers[num].forEach(m=>{
-      let jbtn = document.createElement('button');
-      jbtn.innerHTML = `${num}<sup>${m}</sup>`;
-      jbtn.className = 'jackpot';
-      jbtn.onclick = ()=> select(`${num}^${m}`);
+    multipliers[num].forEach(mult => {
+      let jbtn = document.createElement("button");
+      jbtn.innerHTML = `${num}<sup>${mult}</sup>`;
+      jbtn.className = "btn-jackpot";
+      jbtn.onclick = () => selectNumber(`${num}^${mult}`);
       container.appendChild(jbtn);
     });
 
-    container.appendChild(document.createElement('br'));
-  }
+    container.appendChild(document.createElement("br"));
+  });
 }
 
-function select(value){
+// SELECTION
+function selectNumber(value) {
   current = value;
 }
 
-function addResult(){
-  if(!current) return alert('Choisir un numéro');
+// AJOUT
+function addResult() {
+  if (!current) {
+    alert("Choisir un numéro");
+    return;
+  }
 
   history.push(current);
-  localStorage.setItem('history', JSON.stringify(history));
+  localStorage.setItem("history", JSON.stringify(history));
 
   current = null;
   update();
 }
 
-function resetData(){
-  if(confirm('Supprimer données ?')){
+// RESET
+function resetData() {
+  if (confirm("Supprimer toutes les données ?")) {
     history = [];
-    localStorage.removeItem('history');
+    localStorage.removeItem("history");
     update();
   }
 }
 
-function update(){
-  document.getElementById('history').innerText = history.join(' - ');
+// UPDATE AFFICHAGE
+function update() {
 
+  // historique
+  document.getElementById("history").innerText =
+    "Historique : " + history.join(" - ");
+
+  // fréquence
   let freq = {};
 
-  history.forEach(h=>{
-    let num = h.split('^')[0];
-    freq[num] = (freq[num] || 0) + 1;
+  history.forEach(item => {
+    let base = item.toString().split("^")[0];
+    freq[base] = (freq[base] || 0) + 1;
   });
 
-  let tbody = document.querySelector('#stats tbody');
-  tbody.innerHTML = '';
+  let table = document.getElementById("stats");
+  table.innerHTML = "";
 
-  for(let n in multipliers){
-    let tr = `<tr><td>${n}</td><td>${freq[n] || 0}</td></tr>`;
-    tbody.innerHTML += tr;
-  }
+  numbers.forEach(num => {
+    let tr = `<tr>
+      <td>${num}</td>
+      <td>${freq[num] || 0}</td>
+    </tr>`;
+    table.innerHTML += tr;
+  });
 }
 
+// INIT
 createButtons();
 update();
 
