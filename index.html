@@ -7,199 +7,217 @@
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background:#eef1f5;
-    padding:10px;
+  font-family: Arial;
+  text-align: center;
+  background: #f5f7fa;
 }
 
 .container {
-    max-width:500px;
-    margin:auto;
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
 }
 
-h2 {text-align:center;}
-
-select {
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
+h1 {
+  color: #2c3e50;
 }
 
-.btn {
-    width:32%;
-    padding:12px;
-    margin:5px 1%;
-    border:none;
-    border-radius:8px;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 4px 0 rgba(0,0,0,0.2);
+button {
+  margin: 3px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px #999;
 }
 
-.btn:active {transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,0.2);} 
-
-.add {background:#28a745;}
-.pred {background:#007bff;}
-.chart {background:#ffc107; color:black;}
-.reset {background:#dc3544;}
-
-.box {
-    background:#f7f9fb;
-    padding:10px;
-    border-radius:8px;
-    margin-top:10px;
+button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px #666;
 }
 
-.pattern {
-    background:#ffcc66;
-    padding:5px 8px;
-    border-radius:6px;
-    margin:3px;
-    display:inline-block;
+.btn-normal {
+  background: #3498db;
+  color: white;
 }
 
-.small {font-size:12px;}
+.btn-jackpot {
+  background: #e67e22;
+  color: white;
+}
 
+.actions button {
+  margin-top: 10px;
+  background: #2ecc71;
+  color: white;
+}
+
+.reset {
+  background: #e74c3c;
+}
+
+#history {
+  margin-top: 15px;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background: #2c3e50;
+  color: white;
+}
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="container">
 
-<h2>🎯 Megawheel Tracker PRO</h2>
+<h1>Megawheel Tracker PRO</h1>
 
-<select id="numero">
-<option value="">Choisir numéro</option>
-<option>1</option><option>2</option><option>5</option><option>8</option>
-<option>10</option><option>15</option><option>20</option>
-<option>30</option><option>40</option>
-</select>
+<h3>Choisir numéro</h3>
+<div id="buttons"></div>
 
-<button class="btn add" onclick="ajouter()">➕ Ajouter</button>
-<button class="btn pred" onclick="prediction()">🔍 Prédiction</button>
-<button class="btn chart" onclick="simulation()">📊 Simulation</button>
-
-<button class="btn reset" style="width:100%" onclick="resetData()">🗑 Reset</button>
-
-<div class="box">
-<h3>Historique :</h3>
-<div id="historique"></div>
+<div class="actions">
+  <button onclick="addResult()">+ Ajouter</button>
+  <button class="reset" onclick="resetData()">Reset</button>
 </div>
 
-<div class="box">
-<h3>Résumé :</h3>
-<div id="resume"></div>
-</div>
+<div id="history"></div>
 
-<div class="box">
-<h3>Top 10 Patterns :</h3>
-<div id="patterns"></div>
-</div>
-
-<div class="box">
-<h3>Statistiques :</h3>
-<div id="stats"></div>
-</div>
-
-<div class="box">
-<h3>🤖 Prédiction automatique :</h3>
-<div id="prediction"></div>
-</div>
+<table>
+<thead>
+<tr>
+<th>Numéro</th>
+<th>Fréquence</th>
+</tr>
+</thead>
+<tbody id="stats"></tbody>
+</table>
 
 </div>
 
 <script>
-let valeurs=[1,2,5,8,10,15,20,30,40];
-let resultats=JSON.parse(localStorage.getItem("res"))||[];
-let patterns=JSON.parse(localStorage.getItem("pat"))||{};
 
-function save(){
- localStorage.setItem("res",JSON.stringify(resultats));
- localStorage.setItem("pat",JSON.stringify(patterns));
+// NUMEROS
+const numbers = [1,2,5,8,10,15,20,30,40];
+
+// MULTIPLIERS (ton tableau)
+const multipliers = {
+  1: [5,8,25,88,100],
+  2: [8,25,88,100,200],
+  5: [15,50,88,100,250],
+  8: [20,50,88,100,250],
+  10: [20,50,88,100,250],
+  15: [50,88,100,250,500],
+  20: [50,88,100,250,500],
+  30: [88,100,200,300,500],
+  40: [88,100,200,300,500]
+};
+
+let current = null;
+let history = JSON.parse(localStorage.getItem("history")) || [];
+
+// CREER BOUTONS
+function createButtons() {
+  let container = document.getElementById("buttons");
+  container.innerHTML = "";
+
+  numbers.forEach(num => {
+
+    // bouton normal
+    let btn = document.createElement("button");
+    btn.innerText = num;
+    btn.className = "btn-normal";
+    btn.onclick = () => selectNumber(num);
+    container.appendChild(btn);
+
+    // boutons jackpot
+    multipliers[num].forEach(mult => {
+      let jbtn = document.createElement("button");
+      jbtn.innerHTML = `${num}<sup>${mult}</sup>`;
+      jbtn.className = "btn-jackpot";
+      jbtn.onclick = () => selectNumber(`${num}^${mult}`);
+      container.appendChild(jbtn);
+    });
+
+    container.appendChild(document.createElement("br"));
+  });
 }
 
-function ajouter(){
- let n=document.getElementById("numero").value;
- if(!n) return;
- resultats.push(parseInt(n));
- if(resultats.length>20) resultats.shift();
- update();
+// SELECTION
+function selectNumber(value) {
+  current = value;
 }
 
-function update(){
- document.getElementById("historique").innerText=resultats.join(" - ");
+// AJOUT
+function addResult() {
+  if (!current) {
+    alert("Choisir un numéro");
+    return;
+  }
 
- let freq={};
- resultats.forEach(n=>freq[n]=(freq[n]||0)+1);
+  history.push(current);
+  localStorage.setItem("history", JSON.stringify(history));
 
- let max=null,min=null;
- for(let n in freq){
-  if(max==null||freq[n]>freq[max]) max=n;
-  if(min==null||freq[n]<freq[min]) min=n;
- }
-
- let last4="";
- if(resultats.length>=4){
-  last4=resultats.slice(-4).join("-");
-  patterns[last4]=(patterns[last4]||0)+1;
- }
-
- let totalP=Object.values(patterns).reduce((a,b)=>a+b,0);
- let freqP=patterns[last4]?((patterns[last4]/totalP)*100).toFixed(1):0;
-
- document.getElementById("resume").innerHTML=`+Freq: ${max} (${freq[max]||0}) | -Freq: ${min} (${freq[min]||0})<br>Pattern: ${last4} (${freqP}%)`;
-
- // TOP 10
- let sorted=Object.entries(patterns).sort((a,b)=>b[1]-a[1]).slice(0,10);
- let html="";
- sorted.forEach(p=>{
-  let perc=((p[1]/totalP)*100).toFixed(1);
-  html+=`<div class='pattern'>${p[0]} ${p[1]} (${perc}%)</div>`;
- });
- document.getElementById("patterns").innerHTML=html;
-
- // stats
- document.getElementById("stats").innerHTML=`Plus fréquent: ${max} | Moins fréquent: ${min}`;
-
- save();
+  current = null;
+  update();
 }
 
-function prediction(){
- let freq={};
- resultats.forEach(n=>freq[n]=(freq[n]||0)+1);
-
- let sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
- let best=sorted[0]?sorted[0][0]:"-";
- let worst=sorted[sorted.length-1]?sorted[sorted.length-1][0]:"-";
-
- let bestPattern=Object.entries(patterns).sort((a,b)=>b[1]-a[1])[0];
-
- document.getElementById("prediction").innerHTML=`Probable: ${best}<br>En retard: ${worst}<br>Pattern: ${bestPattern?bestPattern[0]:"-"}`;
+// RESET
+function resetData() {
+  if (confirm("Supprimer toutes les données ?")) {
+    history = [];
+    localStorage.removeItem("history");
+    update();
+  }
 }
 
-function simulation(){
- for(let i=0;i<1000;i++){
-  let r=valeurs[Math.floor(Math.random()*valeurs.length)];
-  resultats.push(r);
- }
- update();
- alert("Simulation 1000 tours ajoutée");
+// UPDATE AFFICHAGE
+function update() {
+
+  // historique
+  document.getElementById("history").innerText =
+    "Historique : " + history.join(" - ");
+
+  // fréquence
+  let freq = {};
+
+  history.forEach(item => {
+    let base = item.toString().split("^")[0];
+    freq[base] = (freq[base] || 0) + 1;
+  });
+
+  let table = document.getElementById("stats");
+  table.innerHTML = "";
+
+  numbers.forEach(num => {
+    let tr = `<tr>
+      <td>${num}</td>
+      <td>${freq[num] || 0}</td>
+    </tr>`;
+    table.innerHTML += tr;
+  });
 }
 
-function resetData(){
- if(confirm("Supprimer données ?")){
-  localStorage.clear();
-  location.reload();
- }
-}
-
+// INIT
+createButtons();
 update();
+
 </script>
 
 </body>
