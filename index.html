@@ -29,9 +29,12 @@
         .btn:active { box-shadow: var(--in-shadow); transform: translateY(2px); }
         .add-btn { background: var(--accent); color: #1a1a2e; padding: 12px 20px; font-size: 12px; }
         
-        /* Grille d'analyse 2x2 pour mobile */
+        /* Bouton Prédiction */
+        .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 15px; font-size: 12px; width: 100%; margin-bottom: 15px; }
+
+        /* Grille d'analyse 2x2 */
         .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 12px; font-size: 11px; }
+        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--white); border: 1px solid #333; padding: 12px; font-size: 11px; }
 
         .prediction-display { 
             background: linear-gradient(145deg, #1e1e3f, #16213e); 
@@ -69,6 +72,8 @@
         <button class="btn add-btn" onclick="addNumber()">ADD</button>
     </div>
 
+    <button class="btn pred-btn-main" onclick="getPrediction()">🎯 OBTENIR PRÉDICTION</button>
+
     <div class="analysis-grid">
         <button class="btn analyser-btn" onclick="fullAnalysis(1)">📊 ANALYSE 1</button>
         <button class="btn analyser-btn" onclick="fullAnalysis(2)">📊 ANALYSE 2</button>
@@ -76,10 +81,10 @@
         <button class="btn analyser-btn" onclick="fullAnalysis(8)">📊 ANALYSE 8</button>
     </div>
 
-    <div class="prediction-display" onclick="getPrediction()">
+    <div class="prediction-display">
         <span style="font-size: 10px; text-transform: uppercase; color: #888;">Suggestion stratégique :</span>
         <span id="suggested-num">--</span>
-        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Appuyez pour calculer</div>
+        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Appuyez sur le bouton or</div>
     </div>
 
     <div class="tabs">
@@ -95,7 +100,7 @@
         <button class="btn simu-btn" onclick="simulate5000()">SIMU 5000</button>
         <button class="btn reset-btn" onclick="resetDatabase()">RESET</button>
     </div>
-    <div style="text-align: center; font-size: 9px; color: #444; margin-top: 10px;">Total: <span id="count">0</span> tours | Mémoire: mw_final_v7</div>
+    <div style="text-align: center; font-size: 9px; color: #444; margin-top: 10px;">Total: <span id="count">0</span> tours</div>
 </div>
 
 <script>
@@ -111,56 +116,4 @@
         const val = document.getElementById("numIn").value;
         if(!val) return;
         results.unshift(parseInt(val));
-        if(results.length > 5000) results.pop();
-        save();
-        updateUI();
-    }
-
-    function fullAnalysis(num) {
-        vibrate(60);
-        if(results.length === 0) { alert("Aucune donnée."); return; }
-
-        const currentDelay = results.indexOf(num);
-        const delayTxt = currentDelay === -1 ? "Hors historique" : currentDelay + " tours";
-        const freq100 = results.slice(0, 100).filter(n => n === num).length;
-        const freq200 = results.slice(0, 200).filter(n => n === num).length;
-
-        let maxDelay = 0;
-        let tempDelay = 0;
-        for (let i = results.length - 1; i >= 0; i--) {
-            if (results[i] === num) {
-                if (tempDelay > maxDelay) maxDelay = tempDelay;
-                tempDelay = 0;
-            } else {
-                tempDelay++;
-            }
-        }
-        if (tempDelay > maxDelay) maxDelay = tempDelay;
-
-        alert(
-            "--- ANALYSE NUMÉRO " + num + " ---\n\n" +
-            "• RETARD ACTUEL : " + delayTxt + "\n" +
-            "• SORTIES (100 tours) : " + freq100 + "\n" +
-            "• SORTIES (200 tours) : " + freq200 + "\n" +
-            "• RECORD ABSENCE (5000 tours) : " + maxDelay + " tours"
-        );
-    }
-
-    function getPrediction() {
-        vibrate(80);
-        if(results.length < 5) return;
-        let lates = values.map(v => ({v, pos: results.indexOf(v)}));
-        let cold = lates.sort((a,b) => b.pos - a.pos)[0];
-        document.getElementById("suggested-num").innerText = cold.v;
-        document.getElementById("pred-info").innerText = "Plus fort retard (" + cold.pos + " tours)";
-    }
-
-    function simulate5000() {
-        vibrate([30, 50]);
-        results = Array.from({length: 5000}, () => values[Math.floor(Math.random() * values.length)]);
-        save();
-        updateUI();
-    }
-
-    function updateUI() {
-        document.
+        if(results.length > 5000) results
