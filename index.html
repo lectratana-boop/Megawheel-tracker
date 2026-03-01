@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Megawheel Tracker Pro</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -23,18 +23,16 @@
 
         .header-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .input-3d { flex: 1; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); padding: 5px; display: flex; align-items: center; }
-        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; outline: none; padding: 10px; cursor: pointer; font-size: 16px; }
+        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; outline: none; padding: 10px; cursor: pointer; font-size: 16px; -webkit-appearance: none; }
         
         .btn { border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: var(--out-shadow); text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
         .btn:active { box-shadow: var(--in-shadow); transform: translateY(2px); }
         .add-btn { background: var(--accent); color: #1a1a2e; padding: 12px 20px; font-size: 12px; }
         
-        .pred-container { margin-bottom: 15px; }
-        .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 15px; font-size: 12px; width: 100%; }
+        .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 15px; font-size: 12px; width: 100%; margin-bottom: 15px; }
 
-        /* Nouvelle grille de 4 boutons simplifiée */
         .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 12px 5px; font-size: 10px; }
+        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 12px 2px; font-size: 9px; }
 
         .prediction-display { 
             background: linear-gradient(145deg, #1e1e3f, #16213e); 
@@ -42,15 +40,14 @@
             text-align: center; border: 2px solid var(--gold); margin-bottom: 15px;
         }
         #suggested-num { font-size: 45px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(241, 196, 15, 0.5); display: block; margin: 10px 0; }
-        .p-pattern { font-size: 12px; border-top: 1px solid #333; padding-top: 10px; color: var(--white); margin-top: 10px; }
 
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 8px; border: none; background: var(--bg); color: #666; font-size: 10px; cursor: pointer; border-radius: 8px; box-shadow: var(--out-shadow); }
+        .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .tab { flex: 1; padding: 8px; border: none; background: var(--bg); color: #666; font-size: 10px; cursor: pointer; border-radius: 8px; }
         .tab.active { color: var(--accent); box-shadow: var(--in-shadow); }
 
-        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 20px; height: 160px; overflow-y: auto; }
+        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 15px; height: 160px; overflow-y: auto; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
-        .res-item { background: var(--card); font-size: 11px; padding: 6px 2px; text-align: center; border-radius: 6px; box-shadow: var(--out-shadow); color: var(--accent); font-weight: bold; }
+        .res-item { background: var(--card); font-size: 11px; padding: 6px 0; text-align: center; border-radius: 6px; color: var(--accent); font-weight: bold; }
 
         .box-3d-stats { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); display: flex; gap: 10px; height: 120px; margin-bottom: 20px; }
         .chart-wrap { flex: 1.5; position: relative; }
@@ -78,9 +75,7 @@
         <button class="btn add-btn" onclick="addNumber()">AJOUTER</button>
     </div>
 
-    <div class="pred-container">
-        <button class="btn pred-btn-main" onclick="getPrediction()">🎯 OBTENIR PRÉDICTION</button>
-    </div>
+    <button class="btn pred-btn-main" onclick="getPrediction()">🎯 OBTENIR PRÉDICTION</button>
 
     <div class="stat-grid-4">
         <button class="btn analyser-btn" onclick="fullAnalysis(1)">STATS 1</button>
@@ -90,16 +85,14 @@
     </div>
 
     <div class="prediction-display">
-        <span style="font-size: 10px; text-transform: uppercase; color: #888;">Suggestion :</span>
         <span id="suggested-num">--</span>
-        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Analyse en attente</div>
-        <div class="p-pattern">PATTERN : <span id="v-pat" style="color:var(--accent); font-weight:bold;">-</span></div>
+        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Prêt</div>
     </div>
 
     <div class="tabs">
-        <button id="t1" class="tab active" onclick="changeTab(1)">1 - 500</button>
-        <button id="t2" class="tab" onclick="changeTab(2)">501 - 1000</button>
-        <button id="t3" class="tab" onclick="changeTab(3)">ARCHIVES</button>
+        <button class="tab active" onclick="changeTab(1)">1-500</button>
+        <button class="tab" onclick="changeTab(2)">501-1000</button>
+        <button class="tab" onclick="changeTab(3)">ARCHIVES</button>
     </div>
 
     <div class="box-3d-large">
@@ -113,9 +106,9 @@
 
     <div class="danger-zone">
         <button class="btn simu-btn" onclick="simulate5000()">📊 SIMU 5000</button>
-        <button class="btn reset-btn" onclick="resetDatabase()">⚠️ RESET ALL</button>
+        <button class="btn reset-btn" onclick="resetDatabase()">⚠️ RESET</button>
     </div>
-    <div style="text-align: center; font-size: 9px; color: #444; margin-top: 10px;">Total tours: <span id="count">0</span></div>
+    <div style="text-align: center; font-size: 9px; color: #444; margin-top: 10px;">Total: <span id="count">0</span> tours</div>
 </div>
 
 <script>
@@ -137,66 +130,78 @@
         updateUI();
     }
 
-    // ANALYSE COMPLÈTE EN UNE FENÊTRE
     function fullAnalysis(num) {
         vibrate(60);
-        if(results.length === 0) { alert("Aucune donnée enregistrée."); return; }
-
-        // 1. Retard Actuel
+        if(results.length === 0) return;
         const currentDelay = results.indexOf(num);
-        const delayTxt = currentDelay === -1 ? "Absent" : currentDelay + " tours";
-
-        // 2. Fréquence 100 et 200
         const freq100 = results.slice(0, 100).filter(n => n === num).length;
         const freq200 = results.slice(0, 200).filter(n => n === num).length;
-
-        // 3. Record d'absence (Max Delay)
-        let maxDelay = 0;
-        let tempDelay = 0;
-        for (let i = results.length - 1; i >= 0; i--) {
-            if (results[i] === num) {
-                if (tempDelay > maxDelay) maxDelay = tempDelay;
-                tempDelay = 0;
-            } else {
-                tempDelay++;
-            }
+        let maxDelay = 0, tempDelay = 0;
+        for (let i = 0; i < results.length; i++) {
+            if (results[i] === num) { if (tempDelay > maxDelay) maxDelay = tempDelay; tempDelay = 0; }
+            else { tempDelay++; }
         }
         if (tempDelay > maxDelay) maxDelay = tempDelay;
 
-        alert(
-            "--- ANALYSE NUMÉRO " + num + " ---\n\n" +
-            "• Retard ACTUEL : " + delayTxt + "\n" +
-            "• Sorties (100 derniers) : " + freq100 + "\n" +
-            "• Sorties (200 derniers) : " + freq200 + "\n" +
-            "• RECORD d'absence : " + maxDelay + " tours"
-        );
-    }
-
-    function simulate5000() {
-        vibrate([30, 50, 30]);
-        results = Array.from({length: 5000}, () => values[Math.floor(Math.random() * values.length)]);
-        save();
-        updateUI();
+        alert("ANALYSE " + num + "\nRetard : " + (currentDelay === -1 ? "Hors historique" : currentDelay) + "\nSorties 100 : " + freq100 + "\nSorties 200 : " + freq200 + "\nRecord Absence : " + maxDelay);
     }
 
     function getPrediction() {
         vibrate(80);
-        if(results.length < 5) return;
+        if(results.length < 2) return;
         let lates = values.map(v => ({v, pos: results.indexOf(v)}));
         let cold = lates.sort((a,b) => b.pos - a.pos)[0];
         document.getElementById("suggested-num").innerText = cold.v;
-        document.getElementById("pred-info").innerText = "Plus fort retard (" + (cold.pos === -1 ? "Max" : cold.pos) + " tours)";
+        document.getElementById("pred-info").innerText = "Retard: " + cold.pos;
     }
 
     function changeTab(n) {
-        vibrate(20);
         activeTab = n;
         document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i+1 === n));
         updateUI();
     }
 
     function updateUI() {
+        // 1. Mise à jour du compteur et de la grille (Priorité)
         document.getElementById("count").innerText = results.length;
         const grid = document.getElementById("grid");
-        let slice = activeTab === 1 ? results.slice(0, 500) : (activeTab === 2 ? results.slice(500, 1000) : results.slice(1000, 5000));
-        grid.innerHTML = slice.map(n => `<div
+        let start = (activeTab - 1) * 500;
+        let slice = results.slice(start, start + 500);
+        grid.innerHTML = slice.map(n => `<div class="res-item">${n}</div>`).join('');
+
+        // 2. Statistiques textuelles
+        const counts = values.map(v => results.filter(r => r === v).length);
+        const total = results.length || 1;
+        document.getElementById("statList").innerHTML = values.map((v, i) => `
+            <div class="stat-line"><b>${v}</b> <span>${counts[i]} (${((counts[i]/total)*100).toFixed(1)}%)</span></div>
+        `).join('');
+
+        // 3. Mise à jour du graphique (avec sécurité Try-Catch)
+        try {
+            const ctx = document.getElementById('chart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
+            if(window.Chart) {
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: values, datasets: [{ data: counts, backgroundColor: '#00ffcc', borderRadius: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#555', font: { size: 8 } }, grid: { display: false } } } }
+                });
+            }
+        } catch (e) { console.log("Chart not ready yet"); }
+    }
+
+    function simulate5000() {
+        if(!confirm("Lancer simulation ?")) return;
+        results = Array.from({length: 5000}, () => values[Math.floor(Math.random() * values.length)]);
+        save();
+        updateUI();
+    }
+
+    function resetDatabase() {
+        if(confirm("Tout effacer ?")) { results = []; save(); updateUI(); }
+    }
+
+    window.onload = updateUI;
+</script>
+</body>
+</html>
