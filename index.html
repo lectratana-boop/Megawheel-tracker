@@ -21,7 +21,6 @@
         
         .app-title { text-align: center; font-size: 1.4rem; font-weight: 900; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Saisie */
         .header-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .input-3d { flex: 1; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); padding: 5px; display: flex; align-items: center; }
         select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; outline: none; padding: 10px; cursor: pointer; font-size: 16px; }
@@ -30,15 +29,14 @@
         .btn:active { box-shadow: var(--in-shadow); transform: translateY(2px); }
         .add-btn { background: var(--accent); color: #1a1a2e; padding: 12px 20px; font-size: 12px; }
         
-        /* Prédiction */
         .pred-container { margin-bottom: 15px; }
         .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 15px; font-size: 12px; width: 100%; }
 
-        /* Boutons de Retard Spécifiques */
-        .delay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .delay-btn { background: var(--card); color: var(--white); border: 1px solid #333; padding: 10px; font-size: 9px; }
+        /* Grilles de boutons de retard et records */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+        .delay-btn { background: var(--card); color: var(--accent); border: 1px solid #333; padding: 8px; font-size: 8px; }
+        .record-btn { background: #1e1e3f; color: var(--gold); border: 1px solid #444; padding: 8px; font-size: 8px; }
 
-        /* Display Prédiction */
         .prediction-display { 
             background: linear-gradient(145deg, #1e1e3f, #16213e); 
             padding: 20px; border-radius: 20px; box-shadow: var(--out-shadow); 
@@ -47,23 +45,19 @@
         #suggested-num { font-size: 45px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(241, 196, 15, 0.5); display: block; margin: 10px 0; }
         .p-pattern { font-size: 12px; border-top: 1px solid #333; padding-top: 10px; color: var(--white); margin-top: 10px; }
 
-        /* Onglets */
         .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
         .tab { flex: 1; padding: 8px; border: none; background: var(--bg); color: #666; font-size: 10px; cursor: pointer; border-radius: 8px; box-shadow: var(--out-shadow); }
         .tab.active { color: var(--accent); box-shadow: var(--in-shadow); }
 
-        /* Rectangle 3D Historique */
-        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 20px; height: 180px; overflow-y: auto; }
+        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 20px; height: 160px; overflow-y: auto; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
         .res-item { background: var(--card); font-size: 11px; padding: 6px 2px; text-align: center; border-radius: 6px; box-shadow: var(--out-shadow); color: var(--accent); font-weight: bold; }
 
-        /* Rectangle 3D Distribution */
         .box-3d-stats { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); display: flex; gap: 10px; height: 120px; margin-bottom: 20px; }
         .chart-wrap { flex: 1.5; position: relative; }
         .list-wrap { flex: 1; overflow-y: auto; font-size: 9px; border-left: 1px solid #333; padding-left: 8px; }
         .stat-line { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #222; }
 
-        /* Zone de danger bas de page */
         .danger-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .simu-btn { background: #34495e; color: white; padding: 10px; font-size: 9px; }
         .reset-btn { background: #c0392b; color: white; padding: 10px; font-size: 9px; opacity: 0.7; }
@@ -89,16 +83,22 @@
         <button class="btn pred-btn-main" onclick="getPrediction()">🎯 OBTENIR PRÉDICTION</button>
     </div>
 
-    <div class="delay-grid">
+    <div class="stat-grid">
         <button class="btn delay-btn" onclick="checkDelay(2)">RETARD N°2</button>
         <button class="btn delay-btn" onclick="checkDelay(5)">RETARD N°5</button>
         <button class="btn delay-btn" onclick="checkDelay(8)">RETARD N°8</button>
     </div>
 
+    <div class="stat-grid">
+        <button class="btn record-btn" onclick="checkMaxDelay(2)">MAX ABSENCE 2</button>
+        <button class="btn record-btn" onclick="checkMaxDelay(5)">MAX ABSENCE 5</button>
+        <button class="btn record-btn" onclick="checkMaxDelay(8)">MAX ABSENCE 8</button>
+    </div>
+
     <div class="prediction-display">
-        <span style="font-size: 10px; text-transform: uppercase; color: #888;">Suggestion à jouer :</span>
+        <span style="font-size: 10px; text-transform: uppercase; color: #888;">Suggestion :</span>
         <span id="suggested-num">--</span>
-        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Prêt pour l'analyse</div>
+        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Analyse en attente</div>
         <div class="p-pattern">PATTERN : <span id="v-pat" style="color:var(--accent); font-weight:bold;">-</span></div>
     </div>
 
@@ -144,14 +144,34 @@
         updateUI();
     }
 
+    // Retard actuel
     function checkDelay(num) {
         vibrate(30);
         const pos = results.indexOf(num);
-        if (pos === -1) {
-            alert("N° " + num + " n'est pas apparu récemment.");
-        } else {
-            alert("N° " + num + " est absent depuis " + pos + " tours.");
+        alert(pos === -1 ? "N° " + num + " absent sur 5000 tours." : "Retard actuel du " + num + " : " + pos + " tours.");
+    }
+
+    // RECORD d'absence (Max Delay) sur 5000 tours
+    function checkMaxDelay(num) {
+        vibrate(60);
+        if(results.length === 0) { alert("Pas de données."); return; }
+        
+        let maxDelay = 0;
+        let currentDelay = 0;
+        
+        // On parcourt de la fin (plus vieux) vers le début (plus récent)
+        for (let i = results.length - 1; i >= 0; i--) {
+            if (results[i] === num) {
+                if (currentDelay > maxDelay) maxDelay = currentDelay;
+                currentDelay = 0;
+            } else {
+                currentDelay++;
+            }
         }
+        // Vérifier aussi le retard en cours
+        if (currentDelay > maxDelay) maxDelay = currentDelay;
+        
+        alert("Record d'absence pour le " + num + " sur cet historique : " + maxDelay + " tours consécutifs.");
     }
 
     function simulate5000() {
