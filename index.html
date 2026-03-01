@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Megawheel Tracker Pro</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -19,20 +18,18 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 15px; display: flex; justify-content: center; overflow-x: hidden; }
         .container { width: 100%; max-width: 480px; background: var(--card); padding: 20px; border-radius: 25px; box-shadow: var(--out-shadow); }
         
-        .app-title { text-align: center; font-size: 1.4rem; font-weight: 900; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .app-title { text-align: center; font-size: 1.2rem; font-weight: 900; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
 
         .header-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .input-3d { flex: 1; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); padding: 5px; display: flex; align-items: center; }
-        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; outline: none; padding: 10px; cursor: pointer; font-size: 16px; }
+        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; outline: none; padding: 10px; cursor: pointer; font-size: 16px; -webkit-appearance: none; }
         
         .btn { border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: var(--out-shadow); text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
         .btn:active { box-shadow: var(--in-shadow); transform: translateY(2px); }
         .add-btn { background: var(--accent); color: #1a1a2e; padding: 12px 20px; font-size: 12px; }
         
-        /* Bouton Prédiction */
         .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 15px; font-size: 12px; width: 100%; margin-bottom: 15px; }
 
-        /* Grille d'analyse 2x2 */
         .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--white); border: 1px solid #333; padding: 12px; font-size: 11px; }
 
@@ -43,13 +40,9 @@
         }
         #suggested-num { font-size: 45px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(241, 196, 15, 0.5); display: block; margin: 10px 0; }
         
-        .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-        .tab { flex: 1; padding: 8px; border: none; background: var(--bg); color: #666; font-size: 10px; cursor: pointer; border-radius: 8px; }
-        .tab.active { color: var(--accent); box-shadow: var(--in-shadow); }
-
-        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 15px; height: 150px; overflow-y: auto; }
+        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 15px; height: 180px; overflow-y: auto; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 5px 0; text-align: center; border-radius: 5px; color: var(--accent); font-weight: bold; }
+        .res-item { background: var(--card); font-size: 10px; padding: 5px 0; text-align: center; border-radius: 5px; color: var(--accent); font-weight: bold; box-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
 
         .danger-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .simu-btn { background: #34495e; color: white; padding: 10px; font-size: 9px; }
@@ -84,36 +77,108 @@
     <div class="prediction-display">
         <span style="font-size: 10px; text-transform: uppercase; color: #888;">Suggestion stratégique :</span>
         <span id="suggested-num">--</span>
-        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Appuyez sur le bouton or</div>
-    </div>
-
-    <div class="tabs">
-        <button class="tab active" onclick="changeTab(1)">1-500</button>
-        <button class="tab" onclick="changeTab(2)">ARCHIVES</button>
+        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Prêt pour l'analyse</div>
     </div>
 
     <div class="box-3d-large">
+        <div style="font-size: 9px; color: #555; margin-bottom: 5px;">HISTORIQUE RÉCENT (<span id="count">0</span>)</div>
         <div id="grid" class="res-grid"></div>
     </div>
 
     <div class="danger-zone">
-        <button class="btn simu-btn" onclick="simulate5000()">SIMU 5000</button>
-        <button class="btn reset-btn" onclick="resetDatabase()">RESET</button>
+        <button class="btn simu-btn" onclick="simulate5000()">📊 SIMU 5000</button>
+        <button class="btn reset-btn" onclick="resetDatabase()">⚠️ RESET</button>
     </div>
-    <div style="text-align: center; font-size: 9px; color: #444; margin-top: 10px;">Total: <span id="count">0</span> tours</div>
 </div>
 
 <script>
+    // Chargement sécurisé des données
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
-    let activeTab = 1;
     const values = [1,2,5,8,10,15,20,30,40];
 
     function vibrate(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
     function save() { localStorage.setItem("mw_final_v7", JSON.stringify(results)); }
 
     function addNumber() {
-        vibrate(40);
         const val = document.getElementById("numIn").value;
         if(!val) return;
+        vibrate(40);
         results.unshift(parseInt(val));
-        if(results.length > 5000) results
+        if(results.length > 5000) results.pop();
+        save();
+        updateUI();
+    }
+
+    function fullAnalysis(num) {
+        vibrate(60);
+        if(results.length === 0) { alert("Ajoutez des numéros d'abord."); return; }
+
+        const currentDelay = results.indexOf(num);
+        const delayTxt = currentDelay === -1 ? "Hors historique" : currentDelay + " tours";
+        
+        // Calcul des fréquences
+        const freq100 = results.slice(0, 100).filter(n => n === num).length;
+        const freq200 = results.slice(0, 200).filter(n => n === num).length;
+
+        // Calcul du record (Max Gap)
+        let maxDelay = 0;
+        let tempDelay = 0;
+        for (let i = 0; i < results.length; i++) {
+            if (results[i] === num) {
+                if (tempDelay > maxDelay) maxDelay = tempDelay;
+                tempDelay = 0;
+            } else {
+                tempDelay++;
+            }
+        }
+        if (tempDelay > maxDelay) maxDelay = tempDelay;
+
+        alert(
+            "ANALYSE N° " + num + "\n" +
+            "------------------\n" +
+            "Retard actuel : " + delayTxt + "\n" +
+            "Sorties (100 derniers) : " + freq100 + "\n" +
+            "Sorties (200 derniers) : " + freq200 + "\n" +
+            "Record d'absence : " + maxDelay + " tours"
+        );
+    }
+
+    function getPrediction() {
+        vibrate(80);
+        if(results.length < 5) return;
+        let lates = values.map(v => ({v, pos: results.indexOf(v)}));
+        let cold = lates.sort((a,b) => b.pos - a.pos)[0];
+        document.getElementById("suggested-num").innerText = cold.v;
+        document.getElementById("pred-info").innerText = "Plus fort retard (" + (cold.pos === -1 ? "∞" : cold.pos) + " tours)";
+    }
+
+    function simulate5000() {
+        if(!confirm("Générer 5000 tours aléatoires ?")) return;
+        vibrate([30, 50]);
+        results = Array.from({length: 5000}, () => values[Math.floor(Math.random() * values.length)]);
+        save();
+        updateUI();
+    }
+
+    function updateUI() {
+        document.getElementById("count").innerText = results.length;
+        const grid = document.getElementById("grid");
+        // On affiche les 500 derniers tours dans la grille
+        const slice = results.slice(0, 500);
+        grid.innerHTML = slice.map(n => `<div class="res-item">${n}</div>`).join('');
+    }
+
+    function resetDatabase() {
+        if(confirm("⚠ Vider tout l'historique ?")) {
+            results = [];
+            save();
+            updateUI();
+            document.getElementById("suggested-num").innerText = "--";
+        }
+    }
+
+    // Lancement au démarrage
+    window.onload = updateUI;
+</script>
+</body>
+</html>
