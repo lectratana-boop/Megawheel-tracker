@@ -3,84 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megawheel Tracker PRO - 5000 Stats</title>
+    <title>MegaWheel Tracker 3D PRO</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #007bff; --success: #28a745; --warning: #ffc107; --danger: #dc3544; --dark: #343a40; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; padding: 10px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: var(--dark); margin-bottom: 20px; }
-        
-        .tabs { display: flex; justify-content: space-between; margin-bottom: 15px; background: #eee; padding: 5px; border-radius: 8px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; cursor: pointer; background: none; font-weight: bold; transition: 0.3; border-radius: 5px; font-size: 13px; }
-        .tab-btn.active { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--primary); }
+        :root {
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --primary: #4ecca3;
+            --accent: #00fff0;
+            --shadow-light: rgba(255, 255, 255, 0.05);
+            --shadow-dark: rgba(0, 0, 0, 0.5);
+        }
 
-        select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        
-        .grid-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .btn { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 13px; }
-        .add { background: var(--success); }
-        .pred { background: var(--primary); }
-        .chart { background: var(--dark); }
-        .reset { background: var(--danger); width: 100%; margin-top: 10px; }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: #eeeeee;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
 
-        .box { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 5px solid var(--primary); }
-        .res-scroll { display: flex; gap: 5px; overflow-x: auto; padding: 10px 0; flex-wrap: wrap; max-height: 200px; overflow-y: auto; }
-        .res-item { background: #444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; min-width: 25px; text-align: center; }
-        
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .stat-card { background: white; padding: 10px; border-radius: 8px; border: 1px solid #eee; text-align: center; }
-        .stat-val { display: block; font-size: 18px; font-weight: bold; color: var(--primary); }
-        .info-text { font-size: 12px; color: #666; margin-top: 5px; text-align: center; }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 30px;
+            box-shadow: 20px 20px 60px #0d1220, -10px -10px 30px #23305c;
+        }
+
+        h2 { text-align: center; font-size: 1.2rem; margin-bottom: 15px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Compactage de la zone de saisie */
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        select {
+            flex: 1;
+            padding: 10px;
+            background: var(--bg);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            outline: none;
+        }
+
+        /* Boutons avec effet 3D (Neumorphism) */
+        .btn {
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 6px 6px 12px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+            font-size: 12px;
+            padding: 10px;
+        }
+
+        .btn:active {
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            transform: translateY(2px);
+        }
+
+        .add { background: #4ecca3; color: #1a1a2e; flex: 0.5; }
+        .pred { background: #3498db; color: white; }
+        .simu { background: #e67e22; color: white; }
+        .reset { background: #e74c3c; color: white; width: 100%; margin-top: 10px; font-size: 10px; opacity: 0.7; }
+
+        .grid-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+
+        /* Tabs compactes */
+        .tabs {
+            display: flex;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            box-shadow: inset 4px 4px 8px #000;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: none;
+            color: #888;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--accent);
+            box-shadow: 3px 3px 6px #000;
+        }
+
+        /* Box Stats & Graphique */
+        .box {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: inset 2px 2px 5px #000;
+        }
+
+        #chartContainer { height: 150px; width: 100%; margin-top: 5px; }
+
+        .res-scroll {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            max-height: 80px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .res-item {
+            background: var(--card-bg);
+            font-size: 10px;
+            padding: 4px;
+            text-align: center;
+            border-radius: 6px;
+            box-shadow: 2px 2px 4px #000;
+            color: var(--accent);
+        }
+
+        .prediction-text {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .stat-val { display: block; font-size: 16px; color: var(--primary); font-weight: bold; }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🎯 Megawheel Tracker PRO</h2>
+    <h2>🎡 MegaWheel 3D</h2>
 
-    <select id="numero">
-        <option value="">Choisir numéro tombé</option>
-        <option value="1">1</option><option value="2">2</option><option value="5">5</option>
-        <option value="8">8</option><option value="10">10</option><option value="15">15</option>
-        <option value="20">20</option><option value="30">30</option><option value="40">40</option>
-    </select>
+    <div class="input-row">
+        <select id="numero">
+            <option value="">N°</option>
+            <script>
+                [1,2,5,8,10,15,20,30,40].forEach(v => document.write(`<option value="${v}">${v}</option>`));
+            </script>
+        </select>
+        <button class="btn add" onclick="ajouter()">AJOUTER</button>
+    </div>
 
-    <div class="grid-btns">
-        <button class="btn add" onclick="ajouter()">➕ Ajouter</button>
-        <button class="btn pred" onclick="prediction()">🔍 Prédiction</button>
-        <button class="btn chart" onclick="simulationFull()">📊 Simu 5000</button>
+    <div class="grid-actions">
+        <button class="btn pred" onclick="prediction()">🔍 ANALYSE 5k</button>
+        <button class="btn simu" onclick="simulationFull()">📊 SIMU 5000</button>
     </div>
 
     <div class="tabs">
-        <button id="t24" class="tab-btn active" onclick="switchTab(24)">Derniers 500 (24h)</button>
-        <button id="t48" class="tab-btn" onclick="switchTab(48)">500-1000 (48h)</button>
-        <button id="t72" class="tab-btn" onclick="switchTab(72)">1000-5000 (72h)</button>
+        <button id="t24" class="tab-btn active" onclick="switchTab(24)">24h (1-500)</button>
+        <button id="t48" class="tab-btn" onclick="switchTab(48)">48h (501-1k)</button>
+        <button id="t72" class="tab-btn" onclick="switchTab(72)">72h (Archive)</button>
     </div>
 
     <div class="box">
-        <h3>Historique (<span id="count">0</span> / 5000)</h3>
+        <div style="font-size: 10px; color: #666; margin-bottom: 5px;">HISTORIQUE (<span id="count">0</span>/5000)</div>
         <div id="historique" class="res-scroll"></div>
-        <div id="empty-msg" style="display:none; text-align:center; color:#999; padding:20px;">Aucune donnée dans cette tranche.</div>
     </div>
 
-    <div class="box" style="border-left-color: var(--success);">
-        <h3>🤖 Analyse sur 5000 résultats</h3>
-        <div id="prediction-res">
-            Cliquez sur "Prédiction" pour analyser la base.
+    <div class="box">
+        <div style="font-size: 10px; color: #666;">DISTRIBUTION DES FRÉQUENCES</div>
+        <div id="chartContainer">
+            <canvas id="myChart"></canvas>
         </div>
     </div>
 
-    <button class="btn reset" onclick="resetData()">🗑 Effacer tout (Reset)</button>
-    <p class="info-text">Les données sont sauvegardées localement dans votre navigateur.</p>
+    <div class="box">
+        <div class="prediction-text" id="pred-res">
+            <div>PROBABLE<span class="stat-val" id="p-top">-</span></div>
+            <div>RETARD<span class="stat-val" id="p-late">-</span></div>
+            <div>PATTERN<span class="stat-val" id="p-pat" style="font-size:10px">-</span></div>
+        </div>
+    </div>
+
+    <button class="btn reset" onclick="resetData()">RÉINITIALISER TOUTE LA BASE</button>
 </div>
 
 <script>
-    let resultats = JSON.parse(localStorage.getItem("mw_pro_5000")) || [];
+    let resultats = JSON.parse(localStorage.getItem("mw_3d_5000")) || [];
     let currentView = 24;
+    let myChart;
 
-    function save() {
-        localStorage.setItem("mw_pro_5000", JSON.stringify(resultats));
-    }
+    function save() { localStorage.setItem("mw_3d_5000", JSON.stringify(resultats)); }
 
     function ajouter() {
         let n = document.getElementById("numero").value;
@@ -91,93 +215,65 @@
         updateUI();
     }
 
-    // SIMULATION MASSIVE DE 5000 TOURS
     function simulationFull() {
         const valeurs = [1,2,5,8,10,15,20,30,40];
-        resultats = []; // On repart à zéro pour la simulation complète
-        for(let i=0; i<5000; i++) {
-            let r = valeurs[Math.floor(Math.random() * valeurs.length)];
-            resultats.push(r);
-        }
+        resultats = Array.from({length: 5000}, () => valeurs[Math.floor(Math.random() * valeurs.length)]);
         save();
         updateUI();
-        alert("Simulation de 5000 résultats terminée !");
     }
 
     function switchTab(h) {
         currentView = h;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        if(h==24) document.getElementById('t24').classList.add('active');
-        if(h==48) document.getElementById('t48').classList.add('active');
-        if(h==72) document.getElementById('t72').classList.add('active');
+        document.getElementById('t'+h).classList.add('active');
         updateUI();
     }
 
     function updateUI() {
+        document.getElementById("count").innerText = resultats.length;
         const histDiv = document.getElementById("historique");
-        const countSpan = document.getElementById("count");
-        const emptyMsg = document.getElementById("empty-msg");
         
-        countSpan.innerText = resultats.length;
+        let slice = currentView === 24 ? resultats.slice(0, 500) : (currentView === 48 ? resultats.slice(500, 1000) : resultats.slice(1000, 5000));
+        histDiv.innerHTML = slice.map(n => `<div class="res-item">${n}</div>`).join('');
+        
+        updateChart();
+        prediction();
+    }
 
-        let aAfficher = [];
-        if(currentView === 24) {
-            aAfficher = resultats.slice(0, 500); // 500 premiers
-        } else if(currentView === 48) {
-            aAfficher = resultats.slice(500, 1000); // 500 suivants
-        } else {
-            aAfficher = resultats.slice(1000, 5000); // Le reste jusqu'à 5000
-        }
+    function updateChart() {
+        const labels = [1,2,5,8,10,15,20,30,40];
+        const dataFreq = labels.map(l => resultats.filter(r => r === l).length);
 
-        if(aAfficher.length === 0) {
-            histDiv.innerHTML = "";
-            emptyMsg.style.display = "block";
-        } else {
-            emptyMsg.style.display = "none";
-            histDiv.innerHTML = aAfficher.map(n => `<div class="res-item">${n}</div>`).join('');
-        }
+        if (myChart) myChart.destroy();
+        const ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Fréquence',
+                    data: dataFreq,
+                    backgroundColor: '#4ecca3',
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#222' }, ticks: { display: false } },
+                    x: { grid: { display: false }, ticks: { color: '#888' } }
+                }
+            }
+        });
     }
 
     function prediction() {
-        if(resultats.length < 10) {
-            alert("Besoin de plus de données pour analyser 5000 tours.");
-            return;
-        }
-
-        // Fréquence sur les 5000
+        if(resultats.length < 5) return;
         let freq = {};
         resultats.forEach(n => freq[n] = (freq[n] || 0) + 1);
-
         let sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]);
-        let top = sorted[0][0];
-        let retard = sorted[sorted.length - 1][0];
-
-        // Pattern (séquence)
-        let lastPattern = resultats.slice(0, 3).reverse().join(" > ");
-
-        document.getElementById("prediction-res").innerHTML = `
-            <div class="stat-grid">
-                <div class="stat-card">Probabilité<span class="stat-val">n° ${top}</span></div>
-                <div class="stat-card">En Retard<span class="stat-val">n° ${retard}</span></div>
-            </div>
-            <div style="margin-top:10px; text-align:center;">
-                <strong>Pattern actuel :</strong> ${lastPattern}<br>
-                <small>Calculé sur un historique de ${resultats.length} tours</small>
-            </div>
-        `;
-    }
-
-    function resetData() {
-        if(confirm("Effacer définitivement les 5000 résultats ?")) {
-            resultats = [];
-            localStorage.removeItem("mw_pro_5000");
-            updateUI();
-            document.getElementById("prediction-res").innerHTML = "Données effacées.";
-        }
-    }
-
-    updateUI();
-</script>
-
-</body>
-</html>
+        
+        document.getElementById("p-top").innerText = sorted[0][0];
+        document.getElementById("p-late").innerText = sorted[sorted.length-1][0];
