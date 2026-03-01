@@ -21,6 +21,7 @@
         
         .app-title { text-align: center; font-size: 1.4rem; font-weight: 900; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
 
+        /* Saisie */
         .header-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .input-3d { flex: 1; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); padding: 5px; display: flex; align-items: center; }
         select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; outline: none; padding: 10px; cursor: pointer; font-size: 16px; }
@@ -29,23 +30,15 @@
         .btn:active { box-shadow: var(--in-shadow); transform: translateY(2px); }
         .add-btn { background: var(--accent); color: #1a1a2e; padding: 12px 20px; font-size: 12px; }
         
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .simu-btn { background: #34495e; color: white; padding: 12px; font-size: 11px; }
-        .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 12px; font-size: 11px; }
+        /* Prédiction */
+        .pred-container { margin-bottom: 15px; }
+        .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 15px; font-size: 12px; width: 100%; }
 
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 8px; border: none; background: var(--bg); color: #666; font-size: 10px; cursor: pointer; border-radius: 8px; box-shadow: var(--out-shadow); }
-        .tab.active { color: var(--accent); box-shadow: var(--in-shadow); }
+        /* Boutons de Retard Spécifiques */
+        .delay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .delay-btn { background: var(--card); color: var(--white); border: 1px solid #333; padding: 10px; font-size: 9px; }
 
-        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 20px; height: 180px; overflow-y: auto; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
-        .res-item { background: var(--card); font-size: 11px; padding: 6px 2px; text-align: center; border-radius: 6px; box-shadow: var(--out-shadow); color: var(--accent); font-weight: bold; }
-
-        .box-3d-stats { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); display: flex; gap: 10px; height: 120px; margin-bottom: 20px; }
-        .chart-wrap { flex: 1.5; position: relative; }
-        .list-wrap { flex: 1; overflow-y: auto; font-size: 9px; border-left: 1px solid #333; padding-left: 8px; }
-        .stat-line { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #222; }
-
+        /* Display Prédiction */
         .prediction-display { 
             background: linear-gradient(145deg, #1e1e3f, #16213e); 
             padding: 20px; border-radius: 20px; box-shadow: var(--out-shadow); 
@@ -54,7 +47,26 @@
         #suggested-num { font-size: 45px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(241, 196, 15, 0.5); display: block; margin: 10px 0; }
         .p-pattern { font-size: 12px; border-top: 1px solid #333; padding-top: 10px; color: var(--white); margin-top: 10px; }
 
-        .reset-btn { background: #c0392b; color: white; padding: 5px; font-size: 9px; width: 100%; opacity: 0.5; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        /* Onglets */
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 8px; border: none; background: var(--bg); color: #666; font-size: 10px; cursor: pointer; border-radius: 8px; box-shadow: var(--out-shadow); }
+        .tab.active { color: var(--accent); box-shadow: var(--in-shadow); }
+
+        /* Rectangle 3D Historique */
+        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 20px; height: 180px; overflow-y: auto; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+        .res-item { background: var(--card); font-size: 11px; padding: 6px 2px; text-align: center; border-radius: 6px; box-shadow: var(--out-shadow); color: var(--accent); font-weight: bold; }
+
+        /* Rectangle 3D Distribution */
+        .box-3d-stats { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); display: flex; gap: 10px; height: 120px; margin-bottom: 20px; }
+        .chart-wrap { flex: 1.5; position: relative; }
+        .list-wrap { flex: 1; overflow-y: auto; font-size: 9px; border-left: 1px solid #333; padding-left: 8px; }
+        .stat-line { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #222; }
+
+        /* Zone de danger bas de page */
+        .danger-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .simu-btn { background: #34495e; color: white; padding: 10px; font-size: 9px; }
+        .reset-btn { background: #c0392b; color: white; padding: 10px; font-size: 9px; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -73,15 +85,20 @@
         <button class="btn add-btn" onclick="addNumber()">AJOUTER</button>
     </div>
 
-    <div class="action-grid">
-        <button class="btn simu-btn" onclick="simulate5000()">📊 SIMULATION 5000</button>
-        <button class="btn pred-btn-main" onclick="getPrediction()">🎯 PRÉDICTION</button>
+    <div class="pred-container">
+        <button class="btn pred-btn-main" onclick="getPrediction()">🎯 OBTENIR PRÉDICTION</button>
+    </div>
+
+    <div class="delay-grid">
+        <button class="btn delay-btn" onclick="checkDelay(2)">RETARD N°2</button>
+        <button class="btn delay-btn" onclick="checkDelay(5)">RETARD N°5</button>
+        <button class="btn delay-btn" onclick="checkDelay(8)">RETARD N°8</button>
     </div>
 
     <div class="prediction-display">
-        <span style="font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 1px;">Numéro suggéré à jouer :</span>
+        <span style="font-size: 10px; text-transform: uppercase; color: #888;">Suggestion à jouer :</span>
         <span id="suggested-num">--</span>
-        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Analysez pour obtenir un conseil</div>
+        <div id="pred-info" style="font-size: 10px; color: var(--accent);">Prêt pour l'analyse</div>
         <div class="p-pattern">PATTERN : <span id="v-pat" style="color:var(--accent); font-weight:bold;">-</span></div>
     </div>
 
@@ -92,7 +109,6 @@
     </div>
 
     <div class="box-3d-large">
-        <div style="font-size: 9px; color: #666; margin-bottom: 8px; text-transform: uppercase;">Historique (<span id="count">0</span>)</div>
         <div id="grid" class="res-grid"></div>
     </div>
 
@@ -101,7 +117,11 @@
         <div id="statList" class="list-wrap"></div>
     </div>
 
-    <button class="reset-btn" onclick="resetDatabase()">VIDER TOUTE LA MÉMOIRE (RESET)</button>
+    <div class="danger-zone">
+        <button class="btn simu-btn" onclick="simulate5000()">📊 SIMU 5000</button>
+        <button class="btn reset-btn" onclick="resetDatabase()">⚠️ RESET ALL</button>
+    </div>
+    <div style="text-align: center; font-size: 9px; color: #444; margin-top: 10px;">Total tours: <span id="count">0</span></div>
 </div>
 
 <script>
@@ -110,17 +130,12 @@
     let chartInstance = null;
     const values = [1,2,5,8,10,15,20,30,40];
 
-    // Fonction de vibration universelle
-    function vibrate(ms = 50) {
-        if (navigator.vibrate) {
-            navigator.vibrate(ms);
-        }
-    }
+    function vibrate(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
 
     function save() { localStorage.setItem("mw_final_v7", JSON.stringify(results)); }
 
     function addNumber() {
-        vibrate(40); // Vibration courte
+        vibrate(40);
         const val = document.getElementById("numIn").value;
         if(!val) return;
         results.unshift(parseInt(val));
@@ -129,23 +144,30 @@
         updateUI();
     }
 
+    function checkDelay(num) {
+        vibrate(30);
+        const pos = results.indexOf(num);
+        if (pos === -1) {
+            alert("N° " + num + " n'est pas apparu récemment.");
+        } else {
+            alert("N° " + num + " est absent depuis " + pos + " tours.");
+        }
+    }
+
     function simulate5000() {
-        vibrate([30, 50, 30]); // Double vibration pour la simu
+        vibrate([30, 50, 30]);
         results = Array.from({length: 5000}, () => values[Math.floor(Math.random() * values.length)]);
         save();
         updateUI();
     }
 
     function getPrediction() {
-        vibrate(80); // Vibration plus longue pour la prédiction
-        if(results.length < 10) {
-            alert("Veuillez ajouter au moins 10 numéros pour une prédiction.");
-            return;
-        }
+        vibrate(80);
+        if(results.length < 5) return;
         let lates = values.map(v => ({v, pos: results.indexOf(v)}));
         let cold = lates.sort((a,b) => b.pos - a.pos)[0];
         document.getElementById("suggested-num").innerText = cold.v;
-        document.getElementById("pred-info").innerText = "Probabilité élevée (Absent depuis " + cold.pos + " tours)";
+        document.getElementById("pred-info").innerText = "Plus fort retard (" + cold.pos + " tours)";
     }
 
     function changeTab(n) {
@@ -178,8 +200,8 @@
     }
 
     function resetDatabase() {
-        if(confirm("Effacer l'historique complet ?")) {
-            vibrate(200); // Vibration d'alerte
+        if(confirm("Voulez-vous effacer tout l'historique ?")) {
+            vibrate(200);
             results = [];
             save();
             updateUI();
