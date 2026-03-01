@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megawheel Tracker PRO - Stats Avancées</title>
+    <title>Megawheel Tracker PRO - 5000 Stats</title>
     <style>
         :root { --primary: #007bff; --success: #28a745; --warning: #ffc107; --danger: #dc3544; --dark: #343a40; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; padding: 10px; color: #333; }
         .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: var(--dark); margin-bottom: 20px; }
         
-        /* Onglets */
         .tabs { display: flex; justify-content: space-between; margin-bottom: 15px; background: #eee; padding: 5px; border-radius: 8px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; cursor: pointer; background: none; font-weight: bold; transition: 0.3s; border-radius: 5px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; cursor: pointer; background: none; font-weight: bold; transition: 0.3; border-radius: 5px; font-size: 13px; }
         .tab-btn.active { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--primary); }
 
         select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
         
         .grid-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .btn { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: all 0.2s; }
-        .btn:active { transform: scale(0.98); }
+        .btn { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 13px; }
         .add { background: var(--success); }
         .pred { background: var(--primary); }
-        .chart { background: var(--warning); color: #000; }
+        .chart { background: var(--dark); }
         .reset { background: var(--danger); width: 100%; margin-top: 10px; }
 
         .box { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 5px solid var(--primary); }
-        .res-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; font-weight: bold; }
-        .res-item { background: var(--dark); color: white; padding: 5px 10px; border-radius: 5px; min-width: 30px; text-align: center; }
+        .res-scroll { display: flex; gap: 5px; overflow-x: auto; padding: 10px 0; flex-wrap: wrap; max-height: 200px; overflow-y: auto; }
+        .res-item { background: #444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; min-width: 25px; text-align: center; }
         
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .stat-card { background: white; padding: 10px; border-radius: 8px; border: 1px solid #eee; text-align: center; }
-        .stat-val { display: block; font-size: 20px; font-weight: bold; color: var(--primary); }
+        .stat-val { display: block; font-size: 18px; font-weight: bold; color: var(--primary); }
+        .info-text { font-size: 12px; color: #666; margin-top: 5px; text-align: center; }
     </style>
 </head>
 <body>
@@ -40,129 +39,145 @@
     <h2>🎯 Megawheel Tracker PRO</h2>
 
     <select id="numero">
-        <option value="">Sélectionner le résultat</option>
-        <script>
-            [1,2,5,8,10,15,20,30,40].forEach(v => document.write(`<option value="${v}">${v}</option>`));
-        </script>
+        <option value="">Choisir numéro tombé</option>
+        <option value="1">1</option><option value="2">2</option><option value="5">5</option>
+        <option value="8">8</option><option value="10">10</option><option value="15">15</option>
+        <option value="20">20</option><option value="30">30</option><option value="40">40</option>
     </select>
 
     <div class="grid-btns">
         <button class="btn add" onclick="ajouter()">➕ Ajouter</button>
-        <button class="btn pred" onclick="analyser5000()">🔍 Analyse 5k</button>
-        <button class="btn chart" onclick="simulation(100)">📊 Simu +100</button>
+        <button class="btn pred" onclick="prediction()">🔍 Prédiction</button>
+        <button class="btn chart" onclick="simulationFull()">📊 Simu 5000</button>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab(24, this)">Dernières 24h</button>
-        <button class="tab-btn" onclick="switchTab(48, this)">48h (Ancien)</button>
-        <button class="tab-btn" onclick="switchTab(72, this)">72h (Archive)</button>
+        <button id="t24" class="tab-btn active" onclick="switchTab(24)">Derniers 500 (24h)</button>
+        <button id="t48" class="tab-btn" onclick="switchTab(48)">500-1000 (48h)</button>
+        <button id="t72" class="tab-btn" onclick="switchTab(72)">1000-5000 (72h)</button>
     </div>
 
     <div class="box">
-        <h3>Historique (<span id="count">0</span>/5000)</h3>
+        <h3>Historique (<span id="count">0</span> / 5000)</h3>
         <div id="historique" class="res-scroll"></div>
+        <div id="empty-msg" style="display:none; text-align:center; color:#999; padding:20px;">Aucune donnée dans cette tranche.</div>
     </div>
 
-    <div id="prediction-box" class="box" style="border-left-color: var(--success);">
-        <h3>🤖 IA Prédiction (Basée sur 5000)</h3>
-        <div id="prediction-content">Ajoutez des données pour voir les probabilités...</div>
+    <div class="box" style="border-left-color: var(--success);">
+        <h3>🤖 Analyse sur 5000 résultats</h3>
+        <div id="prediction-res">
+            Cliquez sur "Prédiction" pour analyser la base.
+        </div>
     </div>
 
-    <button class="btn reset" onclick="resetData()">🗑 Réinitialiser toute la base</button>
+    <button class="btn reset" onclick="resetData()">🗑 Effacer tout (Reset)</button>
+    <p class="info-text">Les données sont sauvegardées localement dans votre navigateur.</p>
 </div>
 
 <script>
-    // Stockage : On garde 5000 résultats
-    let data = JSON.parse(localStorage.getItem("mw_data")) || [];
-    let currentLimit = 24; // Filtre par défaut (simulé par nombre de résultats pour l'exemple)
+    let resultats = JSON.parse(localStorage.getItem("mw_pro_5000")) || [];
+    let currentView = 24;
 
     function save() {
-        localStorage.setItem("mw_data", JSON.stringify(data));
+        localStorage.setItem("mw_pro_5000", JSON.stringify(resultats));
     }
 
     function ajouter() {
-        let val = document.getElementById("numero").value;
-        if(!val) return;
-        
-        // Ajout avec timestamp pour gérer le temps plus tard si besoin
-        data.unshift({ val: parseInt(val), time: Date.now() });
-        
-        // Limite stricte à 5000
-        if(data.length > 5000) data.pop();
-        
+        let n = document.getElementById("numero").value;
+        if(!n) return;
+        resultats.unshift(parseInt(n));
+        if(resultats.length > 5000) resultats.pop();
         save();
         updateUI();
     }
 
-    function switchTab(hours, btn) {
-        currentLimit = hours;
+    // SIMULATION MASSIVE DE 5000 TOURS
+    function simulationFull() {
+        const valeurs = [1,2,5,8,10,15,20,30,40];
+        resultats = []; // On repart à zéro pour la simulation complète
+        for(let i=0; i<5000; i++) {
+            let r = valeurs[Math.floor(Math.random() * valeurs.length)];
+            resultats.push(r);
+        }
+        save();
+        updateUI();
+        alert("Simulation de 5000 résultats terminée !");
+    }
+
+    function switchTab(h) {
+        currentView = h;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if(h==24) document.getElementById('t24').classList.add('active');
+        if(h==48) document.getElementById('t48').classList.add('active');
+        if(h==72) document.getElementById('t72').classList.add('active');
         updateUI();
     }
 
     function updateUI() {
         const histDiv = document.getElementById("historique");
         const countSpan = document.getElementById("count");
+        const emptyMsg = document.getElementById("empty-msg");
         
-        // Simulation du filtrage par onglet (selon votre demande : 500 par tranches)
-        let filtered = [];
-        if(currentLimit === 24) filtered = data.slice(0, 500); 
-        else if(currentLimit === 48) filtered = data.slice(500, 1000);
-        else filtered = data.slice(1000, 1500);
+        countSpan.innerText = resultats.length;
 
-        histDiv.innerHTML = filtered.map(d => `<div class="res-item">${d.val}</div>`).join('');
-        countSpan.innerText = data.length;
+        let aAfficher = [];
+        if(currentView === 24) {
+            aAfficher = resultats.slice(0, 500); // 500 premiers
+        } else if(currentView === 48) {
+            aAfficher = resultats.slice(500, 1000); // 500 suivants
+        } else {
+            aAfficher = resultats.slice(1000, 5000); // Le reste jusqu'à 5000
+        }
+
+        if(aAfficher.length === 0) {
+            histDiv.innerHTML = "";
+            emptyMsg.style.display = "block";
+        } else {
+            emptyMsg.style.display = "none";
+            histDiv.innerHTML = aAfficher.map(n => `<div class="res-item">${n}</div>`).join('');
+        }
     }
 
-    function analyser5000() {
-        if(data.length < 5) {
-            alert("Pas assez de données pour une analyse fiable (min. 5)");
+    function prediction() {
+        if(resultats.length < 10) {
+            alert("Besoin de plus de données pour analyser 5000 tours.");
             return;
         }
 
-        // Calcul des fréquences sur les 5000 résultats
-        let stats = {};
-        data.forEach(d => stats[d.val] = (stats[d.val] || 0) + 1);
+        // Fréquence sur les 5000
+        let freq = {};
+        resultats.forEach(n => freq[n] = (freq[n] || 0) + 1);
 
-        let sorted = Object.entries(stats).sort((a,b) => b[1] - a[1]);
-        let probable = sorted[0][0];
-        let enRetard = sorted[sorted.length - 1][0];
+        let sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]);
+        let top = sorted[0][0];
+        let retard = sorted[sorted.length - 1][0];
 
-        // Détection de pattern simple (les 3 derniers)
-        let pattern = data.slice(0,3).map(d => d.val).join(" → ");
+        // Pattern (séquence)
+        let lastPattern = resultats.slice(0, 3).reverse().join(" > ");
 
-        document.getElementById("prediction-content").innerHTML = `
+        document.getElementById("prediction-res").innerHTML = `
             <div class="stat-grid">
-                <div class="stat-card">Probabilité<span class="stat-val">${probable}</span></div>
-                <div class="stat-card">En Retard<span class="stat-val">${enRetard}</span></div>
+                <div class="stat-card">Probabilité<span class="stat-val">n° ${top}</span></div>
+                <div class="stat-card">En Retard<span class="stat-val">n° ${retard}</span></div>
             </div>
-            <p><strong>Dernier Pattern :</strong> ${pattern}</p>
-            <p><small>Analyse basée sur ${data.length} tours enregistrés.</small></p>
+            <div style="margin-top:10px; text-align:center;">
+                <strong>Pattern actuel :</strong> ${lastPattern}<br>
+                <small>Calculé sur un historique de ${resultats.length} tours</small>
+            </div>
         `;
     }
 
-    function simulation(n) {
-        const possible = [1,2,5,8,10,15,20,30,40];
-        for(let i=0; i<n; i++) {
-            let rand = possible[Math.floor(Math.random() * possible.length)];
-            data.unshift({ val: rand, time: Date.now() });
-        }
-        if(data.length > 5000) data = data.slice(0, 5000);
-        save();
-        updateUI();
-    }
-
     function resetData() {
-        if(confirm("Voulez-vous vraiment effacer les 5000 résultats ?")) {
-            data = [];
-            save();
+        if(confirm("Effacer définitivement les 5000 résultats ?")) {
+            resultats = [];
+            localStorage.removeItem("mw_pro_5000");
             updateUI();
+            document.getElementById("prediction-res").innerHTML = "Données effacées.";
         }
     }
 
-    // Initialisation
     updateUI();
 </script>
+
 </body>
 </html>
