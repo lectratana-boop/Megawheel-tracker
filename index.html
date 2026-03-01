@@ -32,10 +32,9 @@
         .pred-container { margin-bottom: 15px; }
         .pred-btn-main { background: var(--gold); color: #1a1a2e; padding: 15px; font-size: 12px; width: 100%; }
 
-        /* Grilles de boutons de retard et records */
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
-        .delay-btn { background: var(--card); color: var(--accent); border: 1px solid #333; padding: 8px; font-size: 8px; }
-        .record-btn { background: #1e1e3f; color: var(--gold); border: 1px solid #444; padding: 8px; font-size: 8px; }
+        /* Nouvelle grille de 4 boutons simplifiée */
+        .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 12px 5px; font-size: 10px; }
 
         .prediction-display { 
             background: linear-gradient(145deg, #1e1e3f, #16213e); 
@@ -83,16 +82,11 @@
         <button class="btn pred-btn-main" onclick="getPrediction()">🎯 OBTENIR PRÉDICTION</button>
     </div>
 
-    <div class="stat-grid">
-        <button class="btn delay-btn" onclick="checkDelay(2)">RETARD N°2</button>
-        <button class="btn delay-btn" onclick="checkDelay(5)">RETARD N°5</button>
-        <button class="btn delay-btn" onclick="checkDelay(8)">RETARD N°8</button>
-    </div>
-
-    <div class="stat-grid">
-        <button class="btn record-btn" onclick="checkMaxDelay(2)">MAX ABSENCE 2</button>
-        <button class="btn record-btn" onclick="checkMaxDelay(5)">MAX ABSENCE 5</button>
-        <button class="btn record-btn" onclick="checkMaxDelay(8)">MAX ABSENCE 8</button>
+    <div class="stat-grid-4">
+        <button class="btn analyser-btn" onclick="fullAnalysis(1)">STATS 1</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(2)">STATS 2</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(5)">STATS 5</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(8)">STATS 8</button>
     </div>
 
     <div class="prediction-display">
@@ -131,7 +125,6 @@
     const values = [1,2,5,8,10,15,20,30,40];
 
     function vibrate(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
-
     function save() { localStorage.setItem("mw_final_v7", JSON.stringify(results)); }
 
     function addNumber() {
@@ -144,34 +137,39 @@
         updateUI();
     }
 
-    // Retard actuel
-    function checkDelay(num) {
-        vibrate(30);
-        const pos = results.indexOf(num);
-        alert(pos === -1 ? "N° " + num + " absent sur 5000 tours." : "Retard actuel du " + num + " : " + pos + " tours.");
-    }
-
-    // RECORD d'absence (Max Delay) sur 5000 tours
-    function checkMaxDelay(num) {
+    // ANALYSE COMPLÈTE EN UNE FENÊTRE
+    function fullAnalysis(num) {
         vibrate(60);
-        if(results.length === 0) { alert("Pas de données."); return; }
-        
+        if(results.length === 0) { alert("Aucune donnée enregistrée."); return; }
+
+        // 1. Retard Actuel
+        const currentDelay = results.indexOf(num);
+        const delayTxt = currentDelay === -1 ? "Absent" : currentDelay + " tours";
+
+        // 2. Fréquence 100 et 200
+        const freq100 = results.slice(0, 100).filter(n => n === num).length;
+        const freq200 = results.slice(0, 200).filter(n => n === num).length;
+
+        // 3. Record d'absence (Max Delay)
         let maxDelay = 0;
-        let currentDelay = 0;
-        
-        // On parcourt de la fin (plus vieux) vers le début (plus récent)
+        let tempDelay = 0;
         for (let i = results.length - 1; i >= 0; i--) {
             if (results[i] === num) {
-                if (currentDelay > maxDelay) maxDelay = currentDelay;
-                currentDelay = 0;
+                if (tempDelay > maxDelay) maxDelay = tempDelay;
+                tempDelay = 0;
             } else {
-                currentDelay++;
+                tempDelay++;
             }
         }
-        // Vérifier aussi le retard en cours
-        if (currentDelay > maxDelay) maxDelay = currentDelay;
-        
-        alert("Record d'absence pour le " + num + " sur cet historique : " + maxDelay + " tours consécutifs.");
+        if (tempDelay > maxDelay) maxDelay = tempDelay;
+
+        alert(
+            "--- ANALYSE NUMÉRO " + num + " ---\n\n" +
+            "• Retard ACTUEL : " + delayTxt + "\n" +
+            "• Sorties (100 derniers) : " + freq100 + "\n" +
+            "• Sorties (200 derniers) : " + freq200 + "\n" +
+            "• RECORD d'absence : " + maxDelay + " tours"
+        );
     }
 
     function simulate5000() {
@@ -187,7 +185,7 @@
         let lates = values.map(v => ({v, pos: results.indexOf(v)}));
         let cold = lates.sort((a,b) => b.pos - a.pos)[0];
         document.getElementById("suggested-num").innerText = cold.v;
-        document.getElementById("pred-info").innerText = "Plus fort retard (" + cold.pos + " tours)";
+        document.getElementById("pred-info").innerText = "Plus fort retard (" + (cold.pos === -1 ? "Max" : cold.pos) + " tours)";
     }
 
     function changeTab(n) {
@@ -201,35 +199,4 @@
         document.getElementById("count").innerText = results.length;
         const grid = document.getElementById("grid");
         let slice = activeTab === 1 ? results.slice(0, 500) : (activeTab === 2 ? results.slice(500, 1000) : results.slice(1000, 5000));
-        grid.innerHTML = slice.map(n => `<div class="res-item">${n}</div>`).join('');
-
-        const counts = values.map(v => results.filter(r => r === v).length);
-        const total = results.length || 1;
-        document.getElementById("statList").innerHTML = values.map((v, i) => `
-            <div class="stat-line"><b>${v}</b> <span>${counts[i]} (${((counts[i]/total)*100).toFixed(1)}%)</span></div>
-        `).join('');
-
-        const ctx = document.getElementById('chart').getContext('2d');
-        if(chartInstance) chartInstance.destroy();
-        chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: values, datasets: [{ data: counts, backgroundColor: '#00ffcc', borderRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#555', font: { size: 8 } }, grid: { display: false } } } }
-        });
-        document.getElementById("v-pat").innerText = results.length > 0 ? results.slice(0,3).reverse().join(" ➜ ") : "-";
-    }
-
-    function resetDatabase() {
-        if(confirm("Voulez-vous effacer tout l'historique ?")) {
-            vibrate(200);
-            results = [];
-            save();
-            updateUI();
-            document.getElementById("suggested-num").innerText = "--";
-        }
-    }
-
-    window.onload = updateUI;
-</script>
-</body>
-</html>
+        grid.innerHTML = slice.map(n => `<div
