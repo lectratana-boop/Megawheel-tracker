@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v15.0 - Pad Mode</title>
+    <title>Megawheel Tracker IA v15.9</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -16,59 +16,83 @@
             --in-shadow: inset 3px 3px 6px #0d1220, inset -1px -1px 4px #23305c;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 420px; background: var(--card); padding: 15px; border-radius: 20px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        .container { width: 100%; max-width: 420px; background: var(--card); padding: 15px; border-radius: 20px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 8px; }
         
         .app-header { text-align: center; border-bottom: 2px solid #23305c; padding-bottom: 5px; }
-        .app-title { font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .app-title { font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         .app-title span { color: var(--accent); }
 
-        #alert-zone { min-height: 30px; background: rgba(255, 71, 87, 0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--red); border: 1px solid #222; text-align: center; }
-        .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.25) !important; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        /* ZONE ALERTE IA CRITIQUE */
+        #alert-zone { 
+            min-height: 45px; 
+            background: rgba(255, 255, 255, 0.03); 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px; 
+            font-weight: 900; 
+            color: #444; 
+            border: 1px solid #222; 
+            text-align: center;
+            padding: 0 10px;
+            transition: all 0.2s linear;
+        }
+        .active-alert { 
+            background: var(--red) !important; 
+            color: white !important; 
+            border-color: #fff !important;
+            animation: alert-flash 0.5s infinite; 
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.8);
+        }
+        @keyframes alert-flash { 
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
 
-        /* NOUVEAU PAVÉ NUMÉRIQUE */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 5px; }
+        /* PAVÉ NUMÉRIQUE ERGONOMIQUE */
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 5px 0; }
         .num-btn { 
             background: linear-gradient(145deg, #1e2a4a, #16213e);
             border: 1px solid #23305c; color: var(--white);
-            font-size: 1.2rem; font-weight: 900; padding: 15px 0;
+            font-size: 1.3rem; font-weight: 900; padding: 16px 0;
             border-radius: 12px; cursor: pointer; box-shadow: var(--out-shadow);
-            transition: all 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
-        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
+        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.96); color: var(--accent); }
         
-        .del-btn-large { 
-            grid-column: span 3; background: var(--red); color: white; border: none; 
-            border-radius: 12px; font-weight: bold; font-size: 14px; padding: 12px;
-            cursor: pointer; box-shadow: var(--out-shadow); text-transform: uppercase;
+        .del-btn { 
+            grid-column: span 3; background: #2c3e50; color: #bdc3c7; border: none; 
+            border-radius: 12px; font-weight: bold; font-size: 12px; padding: 12px;
+            cursor: pointer; text-transform: uppercase; margin-top: 5px;
         }
-        .del-btn-large:active { box-shadow: var(--in-shadow); transform: scale(0.98); }
 
-        /* TABS ET VUES */
-        .tabs { display: flex; gap: 5px; }
-        .tab-btn { flex: 1; padding: 8px; border-radius: 8px; border: none; background: var(--bg); color: #444; font-size: 9px; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
+        /* STATS & VUES */
+        .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 5px; }
+        .analyser-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; font-weight: bold; padding: 10px 0; border-radius: 8px; cursor: pointer; }
 
-        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 8px; height: 180px; overflow-y: auto; border: 1px solid #222; box-shadow: var(--in-shadow); }
+        .tabs { display: flex; gap: 5px; margin-top: 5px; }
+        .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--bg); color: #555; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); box-shadow: var(--in-shadow); }
+
+        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 10px; height: 180px; overflow-y: auto; border: 1px solid #222; }
         .view-content.active { display: block; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 6px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        .res-item { background: var(--card); font-size: 10px; padding: 7px 0; text-align: center; border-radius: 4px; color: var(--accent); font-weight: bold; position: relative; border: 1px solid #23305c; }
         .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
 
-        .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .analyser-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); font-size: 9px; font-weight: bold; padding: 8px 0; border-radius: 6px; cursor: pointer; }
-
-        .pattern-box { background: var(--bg); border-radius: 12px; padding: 10px; height: 120px; overflow-y: auto; border: 1px solid #23305c; }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 9px; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #23305c; padding-bottom: 3px;}
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 4px 0; font-size: 9px;}
+        .pattern-box { background: var(--bg); border-radius: 12px; padding: 10px; height: 110px; overflow-y: auto; border: 1px solid #23305c; margin-top: 5px; }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 9px; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #23305c; }
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 4px 0; font-size: 10px;}
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="app-header">
-        <div class="app-title">Megawheel <span>Tracker PRO</span></div>
+        <h1 class="app-title">Megawheel <span>Tracker Final</span></h1>
     </div>
 
     <div class="numpad">
@@ -81,10 +105,10 @@
         <button class="num-btn" onclick="quickAdd(20)">20</button>
         <button class="num-btn" onclick="quickAdd(30)">30</button>
         <button class="num-btn" onclick="quickAdd(40)">40</button>
-        <button class="del-btn-large" onclick="deleteLast()">Effacer dernier tour (DEL)</button>
+        <button class="del-btn" onclick="deleteLast()">CORRIGER / EFFACER DERNIER</button>
     </div>
 
-    <div id="alert-zone">SYSTÈME PRÊT</div>
+    <div id="alert-zone">ANALYSEUR IA ACTIF</div>
 
     <div class="stat-grid-4">
         <button class="analyser-btn" onclick="fullAnalysis(1)">ST 1</button>
@@ -102,7 +126,7 @@
     <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="pattern-box">
-        <div class="pattern-title">TOP PATTERNS DÉTECTÉS</div>
+        <div class="pattern-title">DÉTECTION DE SÉQUENCES (TOP PATTERNS)</div>
         <div id="patternList"></div>
     </div>
 </div>
@@ -132,8 +156,7 @@
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
-        // Petit retour sonore pour confirmer l'ajout
-        beep(800, 50); 
+        // Saisie silencieuse comme demandé
     }
 
     function deleteLast() {
@@ -141,18 +164,21 @@
         results.shift();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
-        beep(300, 100);
     }
 
     function updateUI() {
-        document.getElementById("grid-live").innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+        // MAJ Grille Live
+        document.getElementById("grid-live").innerHTML = results.slice(0, 250).map((n, i) => 
+            `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`
+        ).join('');
         
+        // MAJ Grille Archive
         let arcHTML = "";
         for (let i = 0; i < results.length; i++) {
-            if (i > 0 && i % 500 === 0) arcHTML += `<div style="grid-column: span 10; background:var(--gold); color:black; font-size:8px; font-weight:bold; text-align:center; padding:5px; margin:10px 0;">ZONE ${i} TOURS</div>`;
+            if (i > 0 && i % 500 === 0) arcHTML += `<div style="grid-column: span 10; background:var(--gold); color:black; font-size:9px; font-weight:bold; text-align:center; padding:5px; margin:10px 0; border-radius:4px;">PALIER ${i} TOURS</div>`;
             arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
         }
-        document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
+        document.getElementById("grid-archive").innerHTML = arcHTML || "Aucune donnée";
         
         checkAlerts();
         updatePatterns();
@@ -161,17 +187,23 @@
     function checkAlerts() {
         const az = document.getElementById("alert-zone");
         let alerts = [];
-        const d1=results.indexOf(1), d2=results.indexOf(2), d5=results.indexOf(5), d8=results.indexOf(8);
         
-        if(d1 > 10) alerts.push("1 ("+d1+"t)");
-        if(d2 > 20) alerts.push("2 ("+d2+"t)");
-        if(d5 > 40) alerts.push("5 ("+d5+"t)");
-        if(d8 > 40) alerts.push("8 ("+d8+"t)");
+        // Surveillance IA des retards
+        const d1 = results.indexOf(1);
+        const d2 = results.indexOf(2);
+        const d5 = results.indexOf(5);
+        const d8 = results.indexOf(8);
+        
+        // Définition des seuils critiques
+        if(d1 >= 10) alerts.push("1 (" + d1 + "t)");
+        if(d2 >= 20) alerts.push("2 (" + d2 + "t)");
+        if(d5 >= 40) alerts.push("5 (" + d5 + "t)");
+        if(d8 >= 40) alerts.push("8 (" + d8 + "t)");
 
         if(alerts.length > 0) {
-            az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
+            az.innerHTML = "⚠️ ALERTE IA : " + alerts.join(" | ");
             az.classList.add("active-alert");
-            beep(600, 150);
+            beep(550, 250); // Bip sonore d'alerte maintenu
         } else {
             az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS ANALYSÉS";
             az.classList.remove("active-alert");
@@ -188,7 +220,7 @@
                 tempDelay = 0;
             } else tempDelay++;
         }
-        alert("CHIFFRE " + num + "\nRetard actuel: " + (currentDelay === -1 ? "N/A" : currentDelay) + "t\nRecord absence: " + maxDelay + "t");
+        alert("CHIFFRE " + num + "\n\nRetard actuel : " + (currentDelay === -1 ? "N/A" : currentDelay) + " tours\nRecord d'absence : " + maxDelay + " tours");
     }
 
     function updatePatterns() {
@@ -198,9 +230,13 @@
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 8);
+        let sorted = Object.entries(patterns)
+            .filter(p => p[1] > 1)
+            .sort((a,b) => b[1] - a[1])
+            .slice(0, 8);
+            
         document.getElementById("patternList").innerHTML = sorted.map(p => {
-            let seq = p[0].split('-').reverse().join('→');
+            let seq = p[0].split('-').reverse().join(' → ');
             return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
         }).join('');
     }
