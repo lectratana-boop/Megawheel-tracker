@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v14.4</title>
+    <title>Megawheel Tracker v14.5</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -19,7 +19,6 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 480px; background: var(--card); padding: 15px; border-radius: 25px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; }
         
-        /* Header sans photo */
         .app-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #23305c; padding-bottom: 10px; }
         .app-title { font-size: 1.3rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: 2px; }
         .app-title span { color: var(--accent); }
@@ -33,10 +32,11 @@
         @keyframes blink { 50% { opacity: 0.4; } }
 
         .header-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        .input-3d { flex: 2; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); }
-        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; padding: 12px; font-size: 18px; outline: none; text-align: center; }
+        .input-3d { flex: 2; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); border: 1px solid #23305c; }
+        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; padding: 12px; font-size: 18px; outline: none; text-align: center; cursor: pointer; }
         
-        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 11px; height: 45px; }
+        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 11px; height: 45px; transition: active 0.1s; }
+        .btn:active { transform: scale(0.95); }
         .add-btn { background: var(--accent); color: #1a1a2e; flex: 1.2; }
         .del-btn { background: var(--red); color: white; flex: 0.8; }
 
@@ -50,7 +50,6 @@
         .res-item { background: var(--card); font-size: 10px; padding: 8px 0; text-align: center; border-radius: 4px; color: var(--accent); position: relative; font-weight: bold; }
         .res-idx { position: absolute; top: -1px; left: 1px; font-size: 5px; color: #555; }
 
-        /* SÉPARATEURS VISUELS ARCHIVE */
         .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 10px; font-weight: 900; text-align: center; padding: 8px; margin: 15px 0 5px 0; border-radius: 4px; text-transform: uppercase; }
         .sep-1000 { grid-column: span 10; background: var(--red); color: #fff; font-size: 11px; font-weight: 900; text-align: center; padding: 10px; margin: 20px 0 5px 0; border-radius: 4px; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
 
@@ -75,8 +74,15 @@
 
     <div class="header-row">
         <div class="input-3d"><select id="numIn">
-            <option value="">N°</option>
-            <option>1</option><option>2</option><option>5</option><option>8</option><option>10</option><option>15</option><option>20</option><option>30</option><option>40</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="5">5</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
         </select></div>
         <button class="btn add-btn" onclick="addNumber()">AJOUTER</button>
         <button class="btn del-btn" onclick="deleteLast()">DEL</button>
@@ -125,11 +131,9 @@
     }
 
     function updateUI() {
-        // LIVE GRID
         const liveGrid = document.getElementById("grid-live");
         liveGrid.innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
 
-        // ARCHIVE GRID AVEC SÉPARATEURS
         const arcGrid = document.getElementById("grid-archive");
         let arcHTML = "";
         for (let i = 0; i < results.length; i++) {
@@ -144,13 +148,16 @@
     }
 
     function addNumber() {
-        const val = document.getElementById("numIn").value;
+        const select = document.getElementById("numIn");
+        const val = select.value;
         if(!val) return;
+        
         results.unshift(parseInt(val));
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
+        
         updateUI();
-        document.getElementById("numIn").value = "";
+        // IMPORTANT : On ne vide plus le select. Le numéro reste affiché pour un clic multiple.
     }
 
     function deleteLast() {
@@ -185,10 +192,10 @@
     function fullAnalysis(num) {
         if(results.length === 0) return;
         const currentDelay = results.indexOf(num);
-        let maxDelay = 0, tempDelay = 0, endIdx = 0;
+        let maxDelay = 0, tempDelay = 0;
         for (let i = 0; i < results.length; i++) {
             if (results[i] === num) {
-                if (tempDelay > maxDelay) { maxDelay = tempDelay; endIdx = i; }
+                if (tempDelay > maxDelay) maxDelay = tempDelay;
                 tempDelay = 0;
             } else tempDelay++;
         }
