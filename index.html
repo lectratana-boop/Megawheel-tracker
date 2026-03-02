@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v15.0 - Thumb Mode</title>
+    <title>Megawheel Tracker v15.7 - Speed Mode</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -17,75 +17,68 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 5px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 100%; max-width: 400px; background: var(--card); padding: 10px; border-radius: 15px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 6px; }
+        .container { width: 100%; max-width: 400px; background: var(--card); padding: 10px; border-radius: 15px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 6px; height: 98vh; }
         
-        /* HEADER & ALERTES */
         .app-header { text-align: center; border-bottom: 1px solid #23305c; padding-bottom: 2px; }
         .app-title { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; margin: 0; }
-        #alert-zone { min-height: 25px; background: rgba(255, 71, 87, 0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: var(--red); border: 1px solid #333; text-align: center; }
-        .active-alert { border-color: var(--red) !important; animation: blink 1s infinite; background: rgba(255, 71, 87, 0.3) !important; }
-        @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* VUES (LIVE / HISTO) */
-        .action-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 5px; }
-        .tabs { display: flex; gap: 3px; }
-        .tab-btn { flex: 1; padding: 6px; border-radius: 6px; border: none; background: var(--bg); color: #444; font-size: 8px; font-weight: bold; }
-        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
-        .view-content { background: var(--bg); border-radius: 8px; padding: 5px; height: 90px; overflow-y: auto; border: 1px solid #222; }
+        /* ZONE ALERTE IA */
+        #alert-zone { min-height: 35px; background: rgba(255, 71, 87, 0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: var(--white); border: 1px solid #333; text-align: center; padding: 0 5px; transition: 0.3s; }
+        .active-alert { border-color: var(--red) !important; background: var(--red) !important; color: white !important; animation: blink-red 0.8s infinite; box-shadow: 0 0 15px var(--red); }
+        @keyframes blink-red { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* VUES & HISTO */
+        .history-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 120px; }
+        .tabs { display: flex; gap: 3px; margin-bottom: 4px; }
+        .tab-btn { flex: 1; padding: 6px; border-radius: 6px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); }
+        .view-content { flex-grow: 1; background: var(--bg); border-radius: 8px; padding: 5px; overflow-y: auto; border: 1px solid #222; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .res-item { background: var(--card); font-size: 9px; padding: 4px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; }
-        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
+        .res-item { background: var(--card); font-size: 10px; padding: 6px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; border: 1px solid #23305c; }
+        .res-idx { position: absolute; top: 0; left: 1px; font-size: 6px; color: #555; }
 
-        /* PATTERNS REMONTÉS */
-        .pattern-box { background: var(--bg); border-radius: 8px; padding: 6px; height: 100px; overflow-y: auto; border: 1px solid #23305c; }
+        /* STATS & PATTERNS */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .st-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); padding: 5px 0; border-radius: 5px; display: flex; flex-direction: column; align-items: center; font-size: 8px; }
+        .st-val { font-size: 11px; font-weight: 900; color: var(--accent); }
+
+        .pattern-box { background: var(--bg); border-radius: 8px; padding: 6px; height: 70px; overflow-y: auto; border: 1px solid #23305c; }
         .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 3px; text-transform: uppercase; border-bottom: 1px solid #23305c; }
         .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 2px 0; font-size: 8px;}
 
-        /* STATS */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-        .st-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); font-size: 8px; font-weight: bold; padding: 5px 0; border-radius: 5px; cursor: pointer; }
-
-        /* PAVÉ NUMÉRIQUE EN BAS */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-top: 5px; border-top: 1px solid #23305c; }
+        /* PAVÉ NUMÉRIQUE (VIBRATION SUPPRIMÉE) */
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-top: 5px; }
         .num-btn { 
             background: linear-gradient(145deg, #1e2a4a, #16213e);
             border: 1px solid #23305c; color: var(--white);
-            font-size: 1rem; font-weight: 900; padding: 12px 0;
+            font-size: 1.1rem; font-weight: 900; padding: 12px 0;
             border-radius: 8px; cursor: pointer; box-shadow: var(--out-shadow);
         }
-        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 9px; cursor: pointer; grid-column: span 3; padding: 8px; margin-top: 2px; }
-
-        /* SEPARATEURS */
-        .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 7px; font-weight: 900; text-align: center; margin: 5px 0; padding: 2px; }
-        .sep-1000 { grid-column: span 10; background: var(--red); color: #fff; font-size: 8px; font-weight: 900; text-align: center; margin: 7px 0; padding: 3px; }
+        .num-btn:active { background: var(--accent); color: black; }
+        .del-btn { background: var(--red); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; grid-column: span 3; padding: 10px; margin-top: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header"><h1 class="app-title">Megawheel <span>Tracker</span></h1></div>
-    <div id="alert-zone">SYSTÈME PRÊT</div>
-
-    <div class="action-row">
-        <div class="tabs">
-            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
-            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
-        </div>
-    </div>
+    <div class="app-header"><h1 class="app-title">Megawheel <span>AI Tracker v15.7</span></h1></div>
     
-    <div id="live-view" class="view-content"><div id="grid-live" class="res-grid"></div></div>
-    <div id="archive-view" class="view-content" style="display:none;"><div id="grid-archive" class="res-grid"></div></div>
+    <div id="alert-zone">ANALYSE IA EN ATTENTE...</div>
 
-    <div class="stat-grid">
-        <button class="st-btn" onclick="fullAnalysis(1)">ST 1</button>
-        <button class="st-btn" onclick="fullAnalysis(2)">ST 2</button>
-        <button class="st-btn" onclick="fullAnalysis(5)">ST 5</button>
-        <button class="st-btn" onclick="fullAnalysis(8)">ST 8</button>
+    <div class="history-container">
+        <div class="tabs">
+            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE VIEW</button>
+            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE</button>
+        </div>
+        <div id="live-view" class="view-content"><div id="grid-live" class="res-grid"></div></div>
+        <div id="archive-view" class="view-content" style="display:none;"><div id="grid-archive" class="res-grid"></div></div>
     </div>
+
+    <div class="stat-grid" id="mini-stats">
+        </div>
 
     <div class="pattern-box">
-        <div class="pattern-title">TOP PATTERNS</div>
+        <div class="pattern-title">DÉTECTION PATTERNS</div>
         <div id="patternList"></div>
     </div>
 
@@ -99,19 +92,21 @@
         <button class="num-btn" onclick="addNumber(20)">20</button>
         <button class="num-btn" onclick="addNumber(30)">30</button>
         <button class="num-btn" onclick="addNumber(40)">40</button>
-        <button class="del-btn" onclick="deleteLast()">CORRIGER (EFFACER DERNIER)</button>
+        <button class="del-btn" onclick="deleteLast()">EFFACER DERNIER TOUR</button>
     </div>
 </div>
 
 <script>
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Audio Context initialisé au premier clic pour bypasser les restrictions navigateurs
+    let audioCtx = null;
 
-    function triggerVibration(pattern) {
-        if ("vibrate" in navigator) navigator.vibrate(pattern);
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     function beep(freq, dur) {
+        initAudio();
         if(audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -122,14 +117,13 @@
 
     function switchTab(tab) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('live-view').style.display = 'none';
-        document.getElementById('archive-view').style.display = 'none';
+        document.getElementById('live-view').style.display = tab === 'live' ? 'block' : 'none';
+        document.getElementById('archive-view').style.display = tab === 'archive' ? 'block' : 'none';
         document.getElementById('btn-' + tab).classList.add('active');
-        document.getElementById(tab + '-view').style.display = 'block';
     }
 
     function addNumber(val) {
-        triggerVibration(40);
+        initAudio(); // Active le son
         results.unshift(val);
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
@@ -138,22 +132,24 @@
 
     function deleteLast() {
         if(results.length === 0) return;
-        triggerVibration(80);
         results.shift();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
     function updateUI() {
-        document.getElementById("grid-live").innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+        // MAJ Grilles
+        document.getElementById("grid-live").innerHTML = results.slice(0, 200).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
         
-        let arcHTML = "";
-        for (let i = 0; i < results.length; i++) {
-            if (i > 0 && i % 1000 === 0) arcHTML += `<div class="sep-1000">PALIER ${i}</div>`;
-            else if (i > 0 && i % 500 === 0) arcHTML += `<div class="sep-500">ZONE ${i}</div>`;
-            arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
-        }
-        document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
+        // MAJ Stats Rapides
+        const targets = [1, 2, 5, 8];
+        let statHTML = "";
+        targets.forEach(t => {
+            const delay = results.indexOf(t);
+            statHTML += `<div class="st-btn">ST ${t}<span class="st-val">${delay === -1 ? '?' : delay}</span></div>`;
+        });
+        document.getElementById("mini-stats").innerHTML = statHTML;
+
         checkAlerts();
         updatePatterns();
     }
@@ -162,33 +158,20 @@
         const az = document.getElementById("alert-zone");
         let alerts = [];
         const d1=results.indexOf(1), d2=results.indexOf(2), d5=results.indexOf(5), d8=results.indexOf(8);
-        if(d1 > 10) alerts.push("1 ("+d1+"t)");
-        if(d2 > 20) alerts.push("2 ("+d2+"t)");
-        if(d5 > 40) alerts.push("5 ("+d5+"t)");
-        if(d8 > 40) alerts.push("8 ("+d8+"t)");
+        
+        if(d1 >= 10) alerts.push("1 ("+d1+"t)");
+        if(d2 >= 20) alerts.push("2 ("+d2+"t)");
+        if(d5 >= 40) alerts.push("5 ("+d5+"t)");
+        if(d8 >= 40) alerts.push("8 ("+d8+"t)");
 
         if(alerts.length > 0) {
-            az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
+            az.innerHTML = "⚠️ URGENT : " + alerts.join(" | ");
             az.classList.add("active-alert");
-            beep(600, 100);
-            triggerVibration([100, 50, 100]);
+            beep(440, 200); // Signal sonore d'alerte
         } else {
-            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
+            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS ANALYSÉS";
             az.classList.remove("active-alert");
         }
-    }
-
-    function fullAnalysis(num) {
-        if(results.length === 0) return;
-        const currentDelay = results.indexOf(num);
-        let maxDelay = 0, tempDelay = 0;
-        for (let i = 0; i < results.length; i++) {
-            if (results[i] === num) {
-                if (tempDelay > maxDelay) maxDelay = tempDelay;
-                tempDelay = 0;
-            } else tempDelay++;
-        }
-        alert("N°" + num + " | Retard: " + currentDelay + " | Max: " + maxDelay);
     }
 
     function updatePatterns() {
@@ -198,12 +181,13 @@
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 8);
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 6);
         document.getElementById("patternList").innerHTML = sorted.map(p => {
             let seq = p[0].split('-').reverse().join('→');
             return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
         }).join('');
     }
+
     window.onload = updateUI;
 </script>
 </body>
