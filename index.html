@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker Pro - Expert</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <title>Megawheel Tracker Elite v12</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -12,56 +11,69 @@
             --accent: #00ffcc;
             --gold: #f1c40f;
             --white: #ffffff;
+            --red: #ff4757;
             --out-shadow: 8px 8px 16px #0d1220, -4px -4px 12px #23305c;
             --in-shadow: inset 4px 4px 8px #0d1220, inset -2px -2px 6px #23305c;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 15px; display: flex; justify-content: center; overflow-x: hidden; }
-        .container { width: 100%; max-width: 480px; background: var(--card); padding: 20px; border-radius: 25px; box-shadow: var(--out-shadow); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; background: var(--card); padding: 15px; border-radius: 25px; box-shadow: var(--out-shadow); }
         
-        .app-title { text-align: center; font-size: 1.2rem; font-weight: 900; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .app-title { text-align: center; font-size: 1.1rem; font-weight: 900; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
 
-        .header-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .input-3d { flex: 1; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); padding: 5px; }
-        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; padding: 10px; font-size: 16px; outline: none; -webkit-appearance: none; }
+        /* Alert Display */
+        #alert-zone { 
+            min-height: 40px; background: rgba(255, 71, 87, 0.1); border-radius: 10px; 
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; color: var(--red); text-align: center;
+            border: 1px solid transparent; transition: 0.3s;
+        }
+        .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.2) !important; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .header-row { display: flex; gap: 8px; margin-bottom: 15px; }
+        .input-3d { flex: 2; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); padding: 2px; }
+        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; padding: 12px; font-size: 16px; outline: none; -webkit-appearance: none; }
         
-        .btn { border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: var(--out-shadow); text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
-        .btn:active { box-shadow: var(--in-shadow); transform: translateY(2px); }
-        .add-btn { background: var(--accent); color: #1a1a2e; padding: 12px 20px; font-size: 12px; }
-        
+        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+        .add-btn { background: var(--accent); color: #1a1a2e; flex: 1.2; }
+        .del-btn { background: var(--red); color: white; flex: 0.8; }
+
         .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 12px 2px; font-size: 9px; }
+        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 10px 2px; }
 
-        .archive-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; background: var(--bg); padding: 8px; border-radius: 10px; box-shadow: var(--in-shadow); }
-        .archive-controls label { font-size: 10px; color: #888; }
-        .archive-select { background: none; border: none; color: var(--accent); font-weight: bold; font-size: 11px; width: auto; cursor: pointer; }
+        .prediction-box { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); text-align: center; margin-bottom: 15px; border: 1px solid var(--gold); }
+        #suggested-num { font-size: 32px; font-weight: 900; color: var(--gold); display: block; }
+        
+        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); margin-bottom: 15px; height: 160px; overflow-y: auto; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        .res-item { background: var(--card); font-size: 9px; padding: 5px 0; text-align: center; border-radius: 4px; color: var(--accent); position: relative; font-weight: bold; }
+        .res-idx { position: absolute; top: -1px; left: 1px; font-size: 5px; color: #555; }
 
-        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); margin-bottom: 15px; height: 180px; overflow-y: auto; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 6px 0; text-align: center; border-radius: 4px; color: var(--accent); position: relative; font-weight: bold; }
-        .res-idx { position: absolute; top: -2px; left: 1px; font-size: 5px; color: #444; }
-
-        .box-3d-stats { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); display: flex; gap: 10px; height: 100px; margin-bottom: 15px; }
-        .chart-wrap { flex: 1.5; position: relative; }
-        .list-wrap { flex: 1; overflow-y: auto; font-size: 9px; border-left: 1px solid #222; padding-left: 5px; }
+        .pattern-box { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); height: 140px; overflow-y: auto; border: 1px solid #23305c; }
+        .pattern-title { font-size: 10px; color: var(--accent); margin-bottom: 8px; text-align: center; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #23305c; padding-bottom: 4px; }
+        .pattern-line { display: flex; justify-content: space-between; font-size: 9px; padding: 5px 0; border-bottom: 1px solid #222; }
 
         .danger-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .simu-btn { background: #34495e; color: white; padding: 10px; font-size: 9px; }
-        .reset-btn { background: #c0392b; color: white; padding: 10px; font-size: 9px; opacity: 0.8; }
+        .simu-btn { background: #34495e; color: white; padding: 10px; }
+        .reset-btn { background: #c0392b; color: white; padding: 10px; opacity: 0.6; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-title">Tracker Expert v9</div>
+    <div class="app-title">Elite Tracker v12</div>
+
+    <div id="alert-zone">Système prêt - En attente de données</div>
 
     <div class="header-row">
         <div class="input-3d"><select id="numIn">
-            <option value="">N° SORTANT</option>
+            <option value="">N°</option>
             <option>1</option><option>2</option><option>5</option><option>8</option>
             <option>10</option><option>15</option><option>20</option><option>30</option><option>40</option>
         </select></div>
         <button class="btn add-btn" onclick="addNumber()">AJOUTER</button>
+        <button class="btn del-btn" onclick="deleteLast()">DEL</button>
     </div>
 
     <div class="stat-grid-4">
@@ -71,48 +83,69 @@
         <button class="btn analyser-btn" onclick="fullAnalysis(8)">STAT 8</button>
     </div>
 
-    <div class="archive-controls">
-        <label>TRANCHE :</label>
-        <select id="archiveRange" class="archive-select" onchange="updateUI()">
-            <option value="0">1 - 500</option>
-            <option value="500">501 - 1000</option>
-            <option value="1000">1001 - 1500</option>
-            <option value="1500">1501 - 2000</option>
-            <option value="2000">2001 - 2500</option>
-            <option value="2500">2501 - 3000</option>
-            <option value="3000">3001 - 3500</option>
-            <option value="3500">3501 - 4000</option>
-            <option value="4000">4001 - 4500</option>
-            <option value="4500">4501 - 5000</option>
-        </select>
+    <div class="prediction-box">
+        <button class="btn" style="background:var(--gold); color:black; width:100%; padding:8px; margin-bottom:5px;" onclick="getPrediction()">🎯 CALCULER PRÉDICTION</button>
+        <span id="suggested-num">--</span>
+        <div id="pred-info" style="font-size: 9px; color: #888;">Analyse des retards critiques</div>
     </div>
 
     <div class="box-3d-large">
         <div id="grid" class="res-grid"></div>
     </div>
 
-    <div class="box-3d-stats">
-        <div class="chart-wrap"><canvas id="chart"></canvas></div>
-        <div id="statList" class="list-wrap"></div>
+    <div class="pattern-box">
+        <div class="pattern-title">Top 10 Patterns (Séquences de 5)</div>
+        <div id="patternList"></div>
     </div>
 
     <div class="danger-zone">
         <button class="btn simu-btn" onclick="simulate5000()">📊 SIMU 5000</button>
         <button class="btn reset-btn" onclick="resetDatabase()">⚠️ RESET</button>
     </div>
-    <div style="text-align: center; font-size: 9px; color: #444; margin-top: 10px;">Mémoire active : <span id="count">0</span> tours</div>
 </div>
 
 <script>
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
-    let chartInstance = null;
     const values = [1,2,5,8,10,15,20,30,40];
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function vibrate(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
+    function beep(freq = 440, duration = 200) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        osc.start();
+        setTimeout(() => osc.stop(), duration);
+    }
+
+    function checkAlerts() {
+        const az = document.getElementById("alert-zone");
+        let alerts = [];
+        
+        const r1 = results.indexOf(1);
+        const r2 = results.indexOf(2);
+        const r5 = results.indexOf(5);
+        const r8 = results.indexOf(8);
+
+        if(r1 > 10 || r1 === -1 && results.length > 10) alerts.push("⚠️ N°1 ("+r1+"t)");
+        if(r2 > 20 || r2 === -1 && results.length > 20) alerts.push("⚠️ N°2 ("+r2+"t)");
+        if(r5 > 40 || r5 === -1 && results.length > 40) alerts.push("⚠️ N°5 ("+r5+"t)");
+        if(r8 > 40 || r8 === -1 && results.length > 40) alerts.push("⚠️ N°8 ("+r8+"t)");
+
+        if(alerts.length > 0) {
+            az.innerHTML = alerts.join(" | ");
+            az.classList.add("active-alert");
+            beep(660, 150);
+        } else {
+            az.innerHTML = "Aucune alerte critique";
+            az.classList.remove("active-alert");
+        }
+    }
+
     function save() { localStorage.setItem("mw_final_v7", JSON.stringify(results)); }
 
     function addNumber() {
-        vibrate(40);
         const val = document.getElementById("numIn").value;
         if(!val) return;
         results.unshift(parseInt(val));
@@ -121,96 +154,68 @@
         updateUI();
     }
 
-    function fullAnalysis(num) {
-        vibrate(60);
-        if(results.length === 0) { alert("Base de données vide."); return; }
+    function deleteLast() {
+        if(results.length === 0) return;
+        if(confirm("Supprimer " + results[0] + " ?")) {
+            results.shift();
+            save();
+            updateUI();
+        }
+    }
 
+    function fullAnalysis(num) {
+        if(results.length === 0) return;
         const currentDelay = results.indexOf(num);
         const freq100 = results.slice(0, 100).filter(n => n === num).length;
-        const freq200 = results.slice(0, 200).filter(n => n === num).length;
-
-        // Calcul exact du Record Absence et de sa position
-        let maxDelay = 0;
-        let tempDelay = 0;
-        let recordEndIdx = 0;
-
+        let maxDelay = 0, tempDelay = 0, recordEndIdx = 0;
         for (let i = 0; i < results.length; i++) {
             if (results[i] === num) {
-                if (tempDelay > maxDelay) {
-                    maxDelay = tempDelay;
-                    recordEndIdx = i; // Fin de la séquence
-                }
+                if (tempDelay > maxDelay) { maxDelay = tempDelay; recordEndIdx = i; }
                 tempDelay = 0;
-            } else {
-                tempDelay++;
-            }
+            } else { tempDelay++; }
         }
-        // Vérification de la fin de liste
-        if (tempDelay > maxDelay) {
-            maxDelay = tempDelay;
-            recordEndIdx = results.length;
+        const tDeb = recordEndIdx - maxDelay + 1;
+        alert("N°"+num+"\nRetard: "+currentDelay+"\nSorties 100t: "+freq100+"\nRecord Absence: "+maxDelay+"\nZone: "+tDeb+" à "+recordEndIdx);
+    }
+
+    function getPrediction() {
+        if(results.length < 5) return;
+        let lates = values.map(v => ({v, pos: results.indexOf(v)}));
+        let cold = lates.sort((a,b) => b.pos - a.pos)[0];
+        document.getElementById("suggested-num").innerText = cold.v;
+        document.getElementById("pred-info").innerText = "Retard critique : " + (cold.pos === -1 ? "Max" : cold.pos);
+    }
+
+    function updatePatterns() {
+        if(results.length < 10) return;
+        let patterns = {};
+        for(let i=0; i <= results.length - 5; i++) {
+            let p = results.slice(i, i+5).join("-");
+            patterns[p] = (patterns[p] || 0) + 1;
         }
-
-        const tourDebut = recordEndIdx - maxDelay + 1;
-        const tourFin = recordEndIdx;
-
-        alert(
-            "📊 BILAN EXPERT - NUMÉRO " + num + "\n" +
-            "----------------------------\n" +
-            "⏳ RETARD ACTUEL : " + (currentDelay === -1 ? "ABSENT" : currentDelay + " tours") + "\n\n" +
-            "📈 FRÉQUENCE (100t) : " + freq100 + " sorties\n" +
-            "📈 FRÉQUENCE (200t) : " + freq200 + " sorties\n\n" +
-            "🏆 RECORD ABSENCE : " + maxDelay + " tours\n" +
-            "📍 SITUÉ : Entre tour " + tourDebut + " et tour " + tourFin
-        );
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 10);
+        document.getElementById("patternList").innerHTML = sorted.map(p => {
+            let seq = p[0].split('-').reverse().join('→');
+            return `<div class="pattern-line"><span>${seq}</span> <b>${p[1]}x</b></div>`;
+        }).join('');
     }
 
     function updateUI() {
-        document.getElementById("count").innerText = results.length;
-        const offset = parseInt(document.getElementById("archiveRange").value);
         const grid = document.getElementById("grid");
-        
-        const slice = results.slice(offset, offset + 500);
-        grid.innerHTML = slice.map((n, i) => `
-            <div class="res-item">
-                <span class="res-idx">${offset + i + 1}</span>
-                ${n}
-            </div>
-        `).join('');
-
-        const counts = values.map(v => results.filter(r => r === v).length);
-        const total = results.length || 1;
-        document.getElementById("statList").innerHTML = values.map((v, i) => `
-            <div style="display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid #222;">
-                <b>${v}</b> <span>${counts[i]} (${((counts[i]/total)*100).toFixed(0)}%)</span>
-            </div>
-        `).join('');
-
-        try {
-            const ctx = document.getElementById('chart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: values, datasets: [{ data: counts, backgroundColor: '#00ffcc', borderRadius: 3 }] },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{display:false},x:{ticks:{color:'#555',font:{size:8}},grid:{display:false}}} }
-            });
-        } catch(e){}
+        const slice = results.slice(0, 250); // Toujours les 250 derniers pour la vue principale
+        grid.innerHTML = slice.map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+        updatePatterns();
+        checkAlerts();
     }
 
     function simulate5000() {
-        if(!confirm("Générer 5000 tours aléatoires ?")) return;
+        if(!confirm("Générer 5000 tours ?")) return;
         results = Array.from({length: 5000}, () => values[Math.floor(Math.random() * values.length)]);
         save();
         updateUI();
     }
 
-    function resetDatabase() {
-        if(confirm("Vider toute la mémoire ?")) {
-            results = [];
-            save();
-            updateUI();
-        }
-    }
+    function resetDatabase() { if(confirm("Réinitialiser ?")) { results = []; save(); updateUI(); } }
 
     window.onload = updateUI;
 </script>
