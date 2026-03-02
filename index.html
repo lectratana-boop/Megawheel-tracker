@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v15.2 - Analysis Focus</title>
+    <title>Megawheel Tracker PRO v15.3</title>
     <style>
         :root {
             --bg: #0a0e1a;
@@ -27,50 +27,57 @@
         .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.25) !important; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* --- ZONE ANALYSE (HAUT - AGRANDIE) --- */
+        /* --- STATS --- */
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
         .st-btn { 
-            background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 6px; padding: 6px 2px;
-            display: flex; flex-direction: column; align-items: center; color: var(--gold); box-shadow: var(--out-shadow);
+            background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 6px; padding: 5px 2px;
+            display: flex; flex-direction: column; align-items: center; color: var(--gold);
         }
-        .st-btn .st-label { font-size: 10px; font-weight: 900; margin-bottom: 2px; }
-        .st-btn .st-now { font-size: 14px; font-weight: 900; color: var(--accent); }
-        .st-btn .st-val { font-size: 8px; color: #bbb; line-height: 1.1; }
+        .st-btn .st-label { font-size: 9px; font-weight: 900; }
+        .st-btn .st-now { font-size: 13px; font-weight: 900; color: var(--accent); }
+        .st-btn .st-val { font-size: 7px; color: #bbb; line-height: 1.1; }
 
-        .pattern-box { background: var(--bg); border-radius: 6px; padding: 6px; height: 110px; overflow-y: auto; border: 1px solid var(--accent); }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 9px; margin-bottom: 4px; text-transform: uppercase; border-bottom: 1px solid #1e2a4a; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 3px 0; font-size: 9px;}
+        /* --- PATTERNS --- */
+        .pattern-box { background: var(--bg); border-radius: 6px; padding: 5px; height: 90px; overflow-y: auto; border: 1px solid #1e2a4a; }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 2px; text-transform: uppercase; border-bottom: 1px solid #1e2a4a; }
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 2px 0; font-size: 8px;}
 
-        /* --- ZONE HISTORIQUE (MILIEU - RÉDUITE) --- */
-        .history-section { flex-grow: 1; display: flex; flex-direction: column; min-height: 60px; }
-        .tabs { display: flex; gap: 4px; margin-bottom: 2px; }
-        .tab-btn { flex: 1; padding: 4px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 8px; font-weight: bold; cursor: pointer; }
+        /* --- HISTORIQUE (REMPLIT TOUT L'ESPACE VIDE) --- */
+        .history-section { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .tabs { display: flex; gap: 4px; margin: 2px 0; }
+        .tab-btn { flex: 1; padding: 5px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 8px; font-weight: bold; cursor: pointer; }
         .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
         
-        .view-content { flex-grow: 1; background: var(--bg); border-radius: 4px; padding: 4px; overflow-y: auto; border: 1px solid #1e2a4a; max-height: 100px; }
+        .view-content { flex-grow: 1; background: var(--bg); border-radius: 4px; padding: 4px; overflow-y: auto; border: 1px solid #1e2a4a; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .res-item { background: var(--card); font-size: 9px; padding: 3px 0; text-align: center; border-radius: 2px; color: var(--accent); font-weight: bold; position: relative; }
+        .res-item { background: var(--card); font-size: 10px; padding: 4px 0; text-align: center; border-radius: 2px; color: var(--accent); font-weight: bold; position: relative; }
+        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
 
-        /* --- PAVÉ NUMÉRIQUE (BAS) --- */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: auto; }
+        /* --- PAVÉ NUMÉRIQUE & BOUTON EFFACER --- */
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-top: 4px; background: var(--card); }
         .num-btn { 
             background: var(--btn-bg); border: 1px solid #1e2a4a; color: var(--white);
-            font-size: 1.2rem; font-weight: 900; padding: 12px 0;
+            font-size: 1.2rem; font-weight: 900; padding: 10px 0;
             border-radius: 6px; cursor: pointer; box-shadow: var(--out-shadow);
         }
         .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.96); color: var(--accent); }
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 10px; cursor: pointer; grid-column: span 3; padding: 10px; margin-top: 2px; text-transform: uppercase; }
+        
+        /* Bouton effacer remonté et plus visible */
+        .del-btn { 
+            background: var(--red); color: white; border: none; border-radius: 6px; 
+            font-weight: bold; font-size: 10px; cursor: pointer; 
+            grid-column: span 3; padding: 12px; margin-top: 4px; margin-bottom: 10px; 
+            text-transform: uppercase; box-shadow: var(--out-shadow);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header"><h1 class="app-title">Megawheel Tracker PRO v15.2</h1></div>
-    
+    <div class="app-header"><h1 class="app-title">Megawheel Tracker PRO v15.3</h1></div>
     <div id="alert-zone">SYSTÈME PRÊT</div>
 
     <div class="stat-grid" id="stat-container"></div>
-
     <div class="pattern-box">
         <div class="pattern-title">DÉTECTION DE SÉQUENCES</div>
         <div id="patternList"></div>
@@ -78,8 +85,8 @@
 
     <div class="history-section">
         <div class="tabs">
-            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
-            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
+            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE VIEW</button>
+            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE COMPLET</button>
         </div>
         <div id="main-view" class="view-content">
             <div id="grid-content" class="res-grid"></div>
@@ -101,6 +108,7 @@
 </div>
 
 <script>
+    // Utilisation de la même clé pour ne pas perdre les données
     let results = JSON.parse(localStorage.getItem("mw_final_v15")) || [];
     let currentTab = 'live';
 
@@ -142,14 +150,14 @@
     }
 
     function updateUI() {
-        // MAJ GRILLE HISTO
+        // MAJ HISTORIQUE - Utilise tout le flex-grow
         const grid = document.getElementById("grid-content");
         let html = "";
-        const data = currentTab === 'live' ? results.slice(0, 100) : results;
+        const data = currentTab === 'live' ? results.slice(0, 200) : results;
         data.forEach((n, i) => {
-            html += `<div class="res-item">${n}</div>`;
+            html += `<div class="res-item"><span class="res-idx">${i+1}</span>${n}</div>`;
         });
-        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; font-size:9px;'>Vide</div>";
+        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; padding-top:20px; font-size:10px;'>Prêt pour le premier tour...</div>";
 
         // MAJ STATS
         const targets = [1, 2, 5, 8];
@@ -181,7 +189,6 @@
             az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
             az.classList.remove("active-alert");
         }
-
         updatePatterns();
     }
 
