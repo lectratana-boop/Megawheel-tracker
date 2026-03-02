@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker PRO v15.3</title>
+    <title>Megawheel Tracker PRO v15.4</title>
     <style>
         :root {
             --bg: #0a0e1a;
@@ -13,80 +13,71 @@
             --white: #ffffff;
             --red: #ff4757;
             --btn-bg: linear-gradient(145deg, #1e2a4a, #16213e);
-            --out-shadow: 4px 4px 8px #050810, -2px -2px 6px #1e2a4a;
-            --in-shadow: inset 2px 2px 5px #050810, inset -1px -1px 3px #1e2a4a;
+            --out-shadow: 3px 3px 6px #050810, -1px -1px 4px #1e2a4a;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 5px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 100%; max-width: 420px; background: var(--card); padding: 8px; border-radius: 12px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; height: 98vh; gap: 4px; }
+        .container { width: 100%; max-width: 420px; background: var(--card); padding: 8px; border-radius: 12px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; height: 98vh; gap: 3px; }
         
-        .app-header { text-align: center; }
-        .app-title { font-size: 0.85rem; font-weight: 900; text-transform: uppercase; margin: 0; color: var(--accent); }
+        /* HEADER COMPACT */
+        .app-header { text-align: center; display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
+        .app-title { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin: 0; color: var(--accent); }
         
-        #alert-zone { min-height: 22px; background: rgba(255, 71, 87, 0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--red); border: 1px solid #333; }
+        #alert-zone { min-height: 20px; background: rgba(255, 71, 87, 0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--red); border: 1px solid #333; margin: 2px 0; }
         .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.25) !important; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* --- STATS --- */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-        .st-btn { 
-            background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 6px; padding: 5px 2px;
-            display: flex; flex-direction: column; align-items: center; color: var(--gold);
-        }
-        .st-btn .st-label { font-size: 9px; font-weight: 900; }
-        .st-btn .st-now { font-size: 13px; font-weight: 900; color: var(--accent); }
-        .st-btn .st-val { font-size: 7px; color: #bbb; line-height: 1.1; }
+        /* ANALYSE (HAUT) */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+        .st-btn { background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 5px; padding: 4px 1px; display: flex; flex-direction: column; align-items: center; color: var(--gold); }
+        .st-btn .st-label { font-size: 8px; font-weight: 900; }
+        .st-btn .st-now { font-size: 12px; font-weight: 900; color: var(--accent); }
+        .st-btn .st-val { font-size: 7px; color: #bbb; line-height: 1; }
 
-        /* --- PATTERNS --- */
-        .pattern-box { background: var(--bg); border-radius: 6px; padding: 5px; height: 90px; overflow-y: auto; border: 1px solid #1e2a4a; }
+        .pattern-box { background: var(--bg); border-radius: 5px; padding: 4px; height: 75px; overflow-y: auto; border: 1px solid #1e2a4a; }
         .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 2px; text-transform: uppercase; border-bottom: 1px solid #1e2a4a; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 2px 0; font-size: 8px;}
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 1px 0; font-size: 8px;}
 
-        /* --- HISTORIQUE (REMPLIT TOUT L'ESPACE VIDE) --- */
-        .history-section { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .tabs { display: flex; gap: 4px; margin: 2px 0; }
-        .tab-btn { flex: 1; padding: 5px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 8px; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
+        /* HISTORIQUE AGRANDI (TOUT L'ESPACE CENTRAL) */
+        .history-section { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; margin: 2px 0; }
+        .tabs { display: flex; gap: 3px; margin-bottom: 2px; }
+        .tab-btn { flex: 1; padding: 4px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); }
         
-        .view-content { flex-grow: 1; background: var(--bg); border-radius: 4px; padding: 4px; overflow-y: auto; border: 1px solid #1e2a4a; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 4px 0; text-align: center; border-radius: 2px; color: var(--accent); font-weight: bold; position: relative; }
-        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
+        .view-content { flex-grow: 1; background: var(--bg); border-radius: 4px; padding: 5px; overflow-y: auto; border: 1px solid #1e2a4a; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; align-content: start; }
+        .res-item { background: var(--card); font-size: 12px; padding: 6px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: 900; position: relative; border: 1px solid #1e2a4a; }
+        .res-idx { position: absolute; top: 1px; left: 1px; font-size: 6px; color: #555; }
 
-        /* --- PAVÉ NUMÉRIQUE & BOUTON EFFACER --- */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-top: 4px; background: var(--card); }
-        .num-btn { 
-            background: var(--btn-bg); border: 1px solid #1e2a4a; color: var(--white);
-            font-size: 1.2rem; font-weight: 900; padding: 10px 0;
-            border-radius: 6px; cursor: pointer; box-shadow: var(--out-shadow);
-        }
-        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.96); color: var(--accent); }
+        /* PAVÉ ET EFFACER (BAS) */
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-top: 2px; }
+        .num-btn { background: var(--btn-bg); border: 1px solid #1e2a4a; color: var(--white); font-size: 1.1rem; font-weight: 900; padding: 10px 0; border-radius: 6px; cursor: pointer; }
+        .num-btn:active { background: var(--accent); color: #000; }
         
-        /* Bouton effacer remonté et plus visible */
-        .del-btn { 
-            background: var(--red); color: white; border: none; border-radius: 6px; 
-            font-weight: bold; font-size: 10px; cursor: pointer; 
-            grid-column: span 3; padding: 12px; margin-top: 4px; margin-bottom: 10px; 
-            text-transform: uppercase; box-shadow: var(--out-shadow);
-        }
+        .del-btn { background: var(--red); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 10px; cursor: pointer; grid-column: span 3; padding: 10px; margin-top: 2px; text-transform: uppercase; box-shadow: var(--out-shadow); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header"><h1 class="app-title">Megawheel Tracker PRO v15.3</h1></div>
+    <div class="app-header">
+        <h1 class="app-title">MW Tracker <span>PRO v15.4</span></h1>
+        <div style="font-size: 8px; color: var(--gold)" id="tour-count">0 TOURS</div>
+    </div>
+    
     <div id="alert-zone">SYSTÈME PRÊT</div>
 
     <div class="stat-grid" id="stat-container"></div>
+    
     <div class="pattern-box">
-        <div class="pattern-title">DÉTECTION DE SÉQUENCES</div>
+        <div class="pattern-title">PATTERNS RÉCURRENTS</div>
         <div id="patternList"></div>
     </div>
 
     <div class="history-section">
         <div class="tabs">
-            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE VIEW</button>
-            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE COMPLET</button>
+            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE (250)</button>
+            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE (5000)</button>
         </div>
         <div id="main-view" class="view-content">
             <div id="grid-content" class="res-grid"></div>
@@ -108,7 +99,7 @@
 </div>
 
 <script>
-    // Utilisation de la même clé pour ne pas perdre les données
+    // Utilisation de la clé universelle pour charger vos données
     let results = JSON.parse(localStorage.getItem("mw_final_v15")) || [];
     let currentTab = 'live';
 
@@ -150,23 +141,28 @@
     }
 
     function updateUI() {
-        // MAJ HISTORIQUE - Utilise tout le flex-grow
+        // MAJ HISTORIQUE TOTAL
         const grid = document.getElementById("grid-content");
         let html = "";
-        const data = currentTab === 'live' ? results.slice(0, 200) : results;
+        const data = currentTab === 'live' ? results.slice(0, 250) : results;
+        
         data.forEach((n, i) => {
-            html += `<div class="res-item"><span class="res-idx">${i+1}</span>${n}</div>`;
+            // Mise en valeur des numéros ST
+            const isST = [1, 2, 5, 8].includes(n) ? 'border: 1px solid var(--gold); color: var(--gold);' : '';
+            html += `<div class="res-item" style="${isST}"><span class="res-idx">${i+1}</span>${n}</div>`;
         });
-        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; padding-top:20px; font-size:10px;'>Prêt pour le premier tour...</div>";
+        
+        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; padding-top:20px; font-size:10px; color:#555;'>AUCUNE DONNÉE</div>";
+        document.getElementById("tour-count").innerText = results.length + " TOURS";
 
-        // MAJ STATS
+        // MAJ STATS BOUTONS
         const targets = [1, 2, 5, 8];
         let statHTML = "";
         targets.forEach(t => {
             const s = getStats(t);
             statHTML += `
                 <div class="st-btn">
-                    <span class="st-label">STAT ${t}</span>
+                    <span class="st-label">ST ${t}</span>
                     <span class="st-now">${s.delay}T</span>
                     <span class="st-val">50t: ${s.f50} | 100t: ${s.f100}</span>
                     <span class="st-val">MAX: ${s.max}</span>
@@ -183,23 +179,23 @@
             if(d > limit && d !== -1) alerts.push(`${n}(${d}t)`);
         });
         if(alerts.length > 0) {
-            az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
+            az.innerHTML = "⚠️ ALERTE ABSENCE : " + alerts.join(" | ");
             az.classList.add("active-alert");
         } else {
-            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
+            az.innerHTML = "ANALYSE EN COURS...";
             az.classList.remove("active-alert");
         }
         updatePatterns();
     }
 
     function updatePatterns() {
-        if(results.length < 10) return;
+        if(results.length < 6) return;
         let patterns = {};
         for(let i=0; i <= results.length - 5; i++) {
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 6);
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 5);
         document.getElementById("patternList").innerHTML = sorted.map(p => {
             let seq = p[0].split('-').reverse().join('→');
             return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
