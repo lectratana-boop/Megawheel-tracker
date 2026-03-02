@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker Elite v12</title>
+    <title>Elite Tracker v13.5 - Deep Archive</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -19,42 +19,39 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 480px; background: var(--card); padding: 15px; border-radius: 25px; box-shadow: var(--out-shadow); }
         
-        .app-title { text-align: center; font-size: 1.1rem; font-weight: 900; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 12px; }
+        .tab-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; background: var(--bg); color: #555; font-weight: bold; cursor: pointer; box-shadow: var(--out-shadow); font-size: 11px; }
+        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
 
-        /* Alert Display */
-        #alert-zone { 
-            min-height: 40px; background: rgba(255, 71, 87, 0.1); border-radius: 10px; 
-            margin-bottom: 15px; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: bold; color: var(--red); text-align: center;
-            border: 1px solid transparent; transition: 0.3s;
-        }
+        #alert-zone { min-height: 40px; background: rgba(255, 71, 87, 0.05); border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: var(--red); border: 1px solid #222; text-align: center; padding: 0 5px; }
         .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.2) !important; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
         .header-row { display: flex; gap: 8px; margin-bottom: 15px; }
-        .input-3d { flex: 2; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); padding: 2px; }
+        .input-3d { flex: 2; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); }
         select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; padding: 12px; font-size: 16px; outline: none; -webkit-appearance: none; }
         
-        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 11px; height: 45px; }
         .add-btn { background: var(--accent); color: #1a1a2e; flex: 1.2; }
         .del-btn { background: var(--red); color: white; flex: 0.8; }
 
         .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 10px 2px; }
+        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); padding: 8px 2px; }
 
-        .prediction-box { background: var(--bg); border-radius: 15px; padding: 15px; box-shadow: var(--in-shadow); text-align: center; margin-bottom: 15px; border: 1px solid var(--gold); }
-        #suggested-num { font-size: 32px; font-weight: 900; color: var(--gold); display: block; }
-        
-        .box-3d-large { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); margin-bottom: 15px; height: 160px; overflow-y: auto; }
+        .view-content { display: none; background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); height: 320px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #222; }
+        .view-content.active { display: block; }
+
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
-        .res-item { background: var(--card); font-size: 9px; padding: 5px 0; text-align: center; border-radius: 4px; color: var(--accent); position: relative; font-weight: bold; }
+        .res-item { background: var(--card); font-size: 10px; padding: 8px 0; text-align: center; border-radius: 4px; color: var(--accent); position: relative; font-weight: bold; }
         .res-idx { position: absolute; top: -1px; left: 1px; font-size: 5px; color: #555; }
 
-        .pattern-box { background: var(--bg); border-radius: 15px; padding: 10px; box-shadow: var(--in-shadow); height: 140px; overflow-y: auto; border: 1px solid #23305c; }
-        .pattern-title { font-size: 10px; color: var(--accent); margin-bottom: 8px; text-align: center; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #23305c; padding-bottom: 4px; }
-        .pattern-line { display: flex; justify-content: space-between; font-size: 9px; padding: 5px 0; border-bottom: 1px solid #222; }
+        .sep-500 { grid-column: span 10; background: var(--gold); color: black; font-size: 9px; font-weight: 900; text-align: center; padding: 5px; margin: 12px 0 5px 0; border-radius: 4px; text-transform: uppercase; }
+        .sep-1000 { grid-column: span 10; background: var(--red); color: white; font-size: 10px; font-weight: 900; text-align: center; padding: 7px; margin: 15px 0 5px 0; border-radius: 4px; text-transform: uppercase; box-shadow: 0 0 10px rgba(255, 71, 87, 0.3); }
 
-        .danger-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .pattern-box { background: var(--bg); border-radius: 15px; padding: 12px; box-shadow: var(--in-shadow); height: 110px; overflow-y: auto; border: 1px solid #23305c; }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 10px; margin-bottom: 8px; text-transform: uppercase; }
+
+        .danger-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
         .simu-btn { background: #34495e; color: white; padding: 10px; }
         .reset-btn { background: #c0392b; color: white; padding: 10px; opacity: 0.6; }
     </style>
@@ -62,9 +59,12 @@
 <body>
 
 <div class="container">
-    <div class="app-title">Elite Tracker v12</div>
+    <div class="tabs">
+        <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE (250)</button>
+        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">ARCHIVES (5000)</button>
+    </div>
 
-    <div id="alert-zone">Système prêt - En attente de données</div>
+    <div id="alert-zone">SYSTÈME PRÊT</div>
 
     <div class="header-row">
         <div class="input-3d"><select id="numIn">
@@ -77,24 +77,22 @@
     </div>
 
     <div class="stat-grid-4">
-        <button class="btn analyser-btn" onclick="fullAnalysis(1)">STAT 1</button>
-        <button class="btn analyser-btn" onclick="fullAnalysis(2)">STAT 2</button>
-        <button class="btn analyser-btn" onclick="fullAnalysis(5)">STAT 5</button>
-        <button class="btn analyser-btn" onclick="fullAnalysis(8)">STAT 8</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(1)">ST1</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(2)">ST2</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(5)">ST5</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(8)">ST8</button>
     </div>
 
-    <div class="prediction-box">
-        <button class="btn" style="background:var(--gold); color:black; width:100%; padding:8px; margin-bottom:5px;" onclick="getPrediction()">🎯 CALCULER PRÉDICTION</button>
-        <span id="suggested-num">--</span>
-        <div id="pred-info" style="font-size: 9px; color: #888;">Analyse des retards critiques</div>
+    <div id="live-view" class="view-content active">
+        <div id="grid-live" class="res-grid"></div>
     </div>
 
-    <div class="box-3d-large">
-        <div id="grid" class="res-grid"></div>
+    <div id="archive-view" class="view-content">
+        <div id="grid-archive" class="res-grid"></div>
     </div>
 
     <div class="pattern-box">
-        <div class="pattern-title">Top 10 Patterns (Séquences de 5)</div>
+        <div class="pattern-title">TOP PATTERNS (SÉQUENCES DE 5)</div>
         <div id="patternList"></div>
     </div>
 
@@ -109,64 +107,82 @@
     const values = [1,2,5,8,10,15,20,30,40];
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function beep(freq = 440, duration = 200) {
+    function beep(freq, dur) {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = freq;
-        osc.start();
-        setTimeout(() => osc.stop(), duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq; osc.start();
+        setTimeout(() => osc.stop(), dur);
     }
 
-    function checkAlerts() {
-        const az = document.getElementById("alert-zone");
-        let alerts = [];
-        
-        const r1 = results.indexOf(1);
-        const r2 = results.indexOf(2);
-        const r5 = results.indexOf(5);
-        const r8 = results.indexOf(8);
-
-        if(r1 > 10 || r1 === -1 && results.length > 10) alerts.push("⚠️ N°1 ("+r1+"t)");
-        if(r2 > 20 || r2 === -1 && results.length > 20) alerts.push("⚠️ N°2 ("+r2+"t)");
-        if(r5 > 40 || r5 === -1 && results.length > 40) alerts.push("⚠️ N°5 ("+r5+"t)");
-        if(r8 > 40 || r8 === -1 && results.length > 40) alerts.push("⚠️ N°8 ("+r8+"t)");
-
-        if(alerts.length > 0) {
-            az.innerHTML = alerts.join(" | ");
-            az.classList.add("active-alert");
-            beep(660, 150);
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+        if(tab === 'live') {
+            document.getElementById('btn-live').classList.add('active');
+            document.getElementById('live-view').classList.add('active');
         } else {
-            az.innerHTML = "Aucune alerte critique";
-            az.classList.remove("active-alert");
+            document.getElementById('btn-archive').classList.add('active');
+            document.getElementById('archive-view').classList.add('active');
         }
     }
-
-    function save() { localStorage.setItem("mw_final_v7", JSON.stringify(results)); }
 
     function addNumber() {
         const val = document.getElementById("numIn").value;
         if(!val) return;
         results.unshift(parseInt(val));
         if(results.length > 5000) results.pop();
-        save();
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
     function deleteLast() {
         if(results.length === 0) return;
-        if(confirm("Supprimer " + results[0] + " ?")) {
+        if(confirm("Supprimer dernier tour ?")) {
             results.shift();
-            save();
+            localStorage.setItem("mw_final_v7", JSON.stringify(results));
             updateUI();
+        }
+    }
+
+    function updateUI() {
+        const liveGrid = document.getElementById("grid-live");
+        liveGrid.innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+
+        const arcGrid = document.getElementById("grid-archive");
+        let arcHTML = "";
+        for (let i = 0; i < results.length; i++) {
+            if (i > 0 && i % 1000 === 0) arcHTML += `<div class="sep-1000">🚨 PALIER ${i} TOURS</div>`;
+            else if (i > 0 && i % 500 === 0) arcHTML += `<div class="sep-500">📍 ZONE ${i} TOURS</div>`;
+            arcHTML += `<div class="res-item"><span class="res-idx">${i+1}</span>${results[i]}</div>`;
+        }
+        arcGrid.innerHTML = arcHTML;
+        checkAlerts();
+        updatePatterns();
+    }
+
+    function checkAlerts() {
+        const az = document.getElementById("alert-zone");
+        let alerts = [];
+        const r1=results.indexOf(1), r2=results.indexOf(2), r5=results.indexOf(5), r8=results.indexOf(8);
+        if(r1 > 10) alerts.push("1 ("+r1+"t)");
+        if(r2 > 20) alerts.push("2 ("+r2+"t)");
+        if(r5 > 40) alerts.push("5 ("+r5+"t)");
+        if(r8 > 40) alerts.push("8 ("+r8+"t)");
+
+        if(alerts.length > 0) {
+            az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
+            az.classList.add("active-alert");
+            beep(600, 100);
+        } else {
+            az.innerHTML = "SYSTÈME PRÊT • TOTAL : " + results.length + " TOURS";
+            az.classList.remove("active-alert");
         }
     }
 
     function fullAnalysis(num) {
         if(results.length === 0) return;
         const currentDelay = results.indexOf(num);
-        const freq100 = results.slice(0, 100).filter(n => n === num).length;
         let maxDelay = 0, tempDelay = 0, recordEndIdx = 0;
         for (let i = 0; i < results.length; i++) {
             if (results[i] === num) {
@@ -174,16 +190,7 @@
                 tempDelay = 0;
             } else { tempDelay++; }
         }
-        const tDeb = recordEndIdx - maxDelay + 1;
-        alert("N°"+num+"\nRetard: "+currentDelay+"\nSorties 100t: "+freq100+"\nRecord Absence: "+maxDelay+"\nZone: "+tDeb+" à "+recordEndIdx);
-    }
-
-    function getPrediction() {
-        if(results.length < 5) return;
-        let lates = values.map(v => ({v, pos: results.indexOf(v)}));
-        let cold = lates.sort((a,b) => b.pos - a.pos)[0];
-        document.getElementById("suggested-num").innerText = cold.v;
-        document.getElementById("pred-info").innerText = "Retard critique : " + (cold.pos === -1 ? "Max" : cold.pos);
+        alert("N°"+num+"\nRetard: "+currentDelay+"\nRecord Absence: "+maxDelay+"\nTrouvé entre tours: "+(recordEndIdx-maxDelay+1)+" et "+recordEndIdx);
     }
 
     function updatePatterns() {
@@ -196,26 +203,18 @@
         let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 10);
         document.getElementById("patternList").innerHTML = sorted.map(p => {
             let seq = p[0].split('-').reverse().join('→');
-            return `<div class="pattern-line"><span>${seq}</span> <b>${p[1]}x</b></div>`;
+            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #222; padding:4px 0;"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
         }).join('');
     }
 
-    function updateUI() {
-        const grid = document.getElementById("grid");
-        const slice = results.slice(0, 250); // Toujours les 250 derniers pour la vue principale
-        grid.innerHTML = slice.map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
-        updatePatterns();
-        checkAlerts();
-    }
-
     function simulate5000() {
-        if(!confirm("Générer 5000 tours ?")) return;
+        if(!confirm("Simuler 5000 tours ?")) return;
         results = Array.from({length: 5000}, () => values[Math.floor(Math.random() * values.length)]);
-        save();
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
-    function resetDatabase() { if(confirm("Réinitialiser ?")) { results = []; save(); updateUI(); } }
+    function resetDatabase() { if(confirm("RESET?")) { results = []; localStorage.setItem("mw_final_v7", JSON.stringify(results)); updateUI(); } }
 
     window.onload = updateUI;
 </script>
