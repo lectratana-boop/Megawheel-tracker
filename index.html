@@ -3,86 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker PRO v15.4</title>
+    <title>Megawheel Tracker v14.9 - Vibration Mode</title>
     <style>
         :root {
-            --bg: #0a0e1a;
+            --bg: #1a1a2e;
             --card: #16213e;
             --accent: #00ffcc;
             --gold: #f1c40f;
             --white: #ffffff;
             --red: #ff4757;
-            --btn-bg: linear-gradient(145deg, #1e2a4a, #16213e);
-            --out-shadow: 3px 3px 6px #050810, -1px -1px 4px #1e2a4a;
+            --out-shadow: 4px 4px 8px #0d1220, -2px -2px 6px #23305c;
+            --in-shadow: inset 3px 3px 6px #0d1220, inset -1px -1px 4px #23305c;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 5px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 100%; max-width: 420px; background: var(--card); padding: 8px; border-radius: 12px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; height: 98vh; gap: 3px; }
+        .container { width: 100%; max-width: 400px; background: var(--card); padding: 10px; border-radius: 15px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 5px; }
         
-        /* HEADER COMPACT */
-        .app-header { text-align: center; display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
-        .app-title { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin: 0; color: var(--accent); }
-        
-        #alert-zone { min-height: 20px; background: rgba(255, 71, 87, 0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--red); border: 1px solid #333; margin: 2px 0; }
-        .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.25) !important; animation: blink 1s infinite; }
+        .app-header { text-align: center; border-bottom: 1px solid #23305c; padding-bottom: 2px; }
+        .app-title { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; margin: 0; }
+        .app-title span { color: var(--accent); }
+
+        #alert-zone { min-height: 25px; background: rgba(255, 71, 87, 0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: var(--red); border: 1px solid #333; text-align: center; }
+        .active-alert { border-color: var(--red) !important; animation: blink 1s infinite; background: rgba(255, 71, 87, 0.3) !important; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* ANALYSE (HAUT) */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
-        .st-btn { background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 5px; padding: 4px 1px; display: flex; flex-direction: column; align-items: center; color: var(--gold); }
-        .st-btn .st-label { font-size: 8px; font-weight: 900; }
-        .st-btn .st-now { font-size: 12px; font-weight: 900; color: var(--accent); }
-        .st-btn .st-val { font-size: 7px; color: #bbb; line-height: 1; }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .num-btn { 
+            background: linear-gradient(145deg, #1e2a4a, #16213e);
+            border: 1px solid #23305c; color: var(--white);
+            font-size: 0.9rem; font-weight: 900; padding: 8px 0;
+            border-radius: 8px; cursor: pointer; box-shadow: var(--out-shadow);
+        }
+        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
 
-        .pattern-box { background: var(--bg); border-radius: 5px; padding: 4px; height: 75px; overflow-y: auto; border: 1px solid #1e2a4a; }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 2px; text-transform: uppercase; border-bottom: 1px solid #1e2a4a; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 1px 0; font-size: 8px;}
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .st-btn { 
+            background: #0f172a; border: 1px solid var(--gold); color: var(--gold);
+            font-size: 8px; font-weight: bold; padding: 5px 0; border-radius: 5px; cursor: pointer;
+        }
 
-        /* HISTORIQUE AGRANDI (TOUT L'ESPACE CENTRAL) */
-        .history-section { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; margin: 2px 0; }
-        .tabs { display: flex; gap: 3px; margin-bottom: 2px; }
-        .tab-btn { flex: 1; padding: 4px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); }
-        
-        .view-content { flex-grow: 1; background: var(--bg); border-radius: 4px; padding: 5px; overflow-y: auto; border: 1px solid #1e2a4a; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; align-content: start; }
-        .res-item { background: var(--card); font-size: 12px; padding: 6px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: 900; position: relative; border: 1px solid #1e2a4a; }
-        .res-idx { position: absolute; top: 1px; left: 1px; font-size: 6px; color: #555; }
+        .action-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 5px; }
+        .tabs { display: flex; gap: 3px; }
+        .tab-btn { flex: 1; padding: 6px; border-radius: 6px; border: none; background: var(--bg); color: #444; font-size: 8px; font-weight: bold; }
+        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
+        .del-btn { background: var(--red); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 8px; cursor: pointer; }
 
-        /* PAVÉ ET EFFACER (BAS) */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-top: 2px; }
-        .num-btn { background: var(--btn-bg); border: 1px solid #1e2a4a; color: var(--white); font-size: 1.1rem; font-weight: 900; padding: 10px 0; border-radius: 6px; cursor: pointer; }
-        .num-btn:active { background: var(--accent); color: #000; }
-        
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 10px; cursor: pointer; grid-column: span 3; padding: 10px; margin-top: 2px; text-transform: uppercase; box-shadow: var(--out-shadow); }
+        .view-content { display: none; background: var(--bg); border-radius: 8px; padding: 5px; height: 110px; overflow-y: auto; border: 1px solid #222; }
+        .view-content.active { display: block; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+        .res-item { background: var(--card); font-size: 9px; padding: 4px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; }
+        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
+
+        .pattern-box { background: var(--bg); border-radius: 8px; padding: 6px; flex: 1; overflow-y: auto; border: 1px solid #23305c; }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 3px; text-transform: uppercase; border-bottom: 1px solid #23305c; }
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 2px 0; font-size: 8px;}
+
+        .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 7px; font-weight: 900; text-align: center; margin: 5px 0; padding: 2px; }
+        .sep-1000 { grid-column: span 10; background: var(--red); color: #fff; font-size: 8px; font-weight: 900; text-align: center; margin: 7px 0; padding: 3px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header">
-        <h1 class="app-title">MW Tracker <span>PRO v15.4</span></h1>
-        <div style="font-size: 8px; color: var(--gold)" id="tour-count">0 TOURS</div>
-    </div>
-    
+    <div class="app-header"><h1 class="app-title">Megawheel <span>Tracker</span></h1></div>
     <div id="alert-zone">SYSTÈME PRÊT</div>
-
-    <div class="stat-grid" id="stat-container"></div>
-    
-    <div class="pattern-box">
-        <div class="pattern-title">PATTERNS RÉCURRENTS</div>
-        <div id="patternList"></div>
-    </div>
-
-    <div class="history-section">
-        <div class="tabs">
-            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE (250)</button>
-            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE (5000)</button>
-        </div>
-        <div id="main-view" class="view-content">
-            <div id="grid-content" class="res-grid"></div>
-        </div>
-    </div>
 
     <div class="numpad">
         <button class="num-btn" onclick="addNumber(1)">1</button>
@@ -94,114 +78,135 @@
         <button class="num-btn" onclick="addNumber(20)">20</button>
         <button class="num-btn" onclick="addNumber(30)">30</button>
         <button class="num-btn" onclick="addNumber(40)">40</button>
-        <button class="del-btn" onclick="deleteLast()">EFFACER DERNIER TOUR</button>
+    </div>
+
+    <div class="stat-grid">
+        <button class="st-btn" onclick="fullAnalysis(1)">ST 1</button>
+        <button class="st-btn" onclick="fullAnalysis(2)">ST 2</button>
+        <button class="st-btn" onclick="fullAnalysis(5)">ST 5</button>
+        <button class="st-btn" onclick="fullAnalysis(8)">ST 8</button>
+    </div>
+
+    <div class="action-row">
+        <button class="del-btn" onclick="deleteLast()">EFFACER</button>
+        <div class="tabs">
+            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
+            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
+        </div>
+    </div>
+
+    <div id="live-view" class="view-content active"><div id="grid-live" class="res-grid"></div></div>
+    <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
+
+    <div class="pattern-box">
+        <div class="pattern-title">TOP PATTERNS</div>
+        <div id="patternList"></div>
     </div>
 </div>
 
 <script>
-    // Utilisation de la clé universelle pour charger vos données
-    let results = JSON.parse(localStorage.getItem("mw_final_v15")) || [];
-    let currentTab = 'live';
+    let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function triggerVibration(pattern) { if ("vibrate" in navigator) navigator.vibrate(pattern); }
+    // Fonction de vibration universelle
+    function triggerVibration(pattern) {
+        if ("vibrate" in navigator) {
+            navigator.vibrate(pattern);
+        }
+    }
+
+    function beep(freq, dur) {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq; osc.start();
+        setTimeout(() => osc.stop(), dur);
+    }
 
     function switchTab(tab) {
-        currentTab = tab;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
         document.getElementById('btn-' + tab).classList.add('active');
-        updateUI();
+        document.getElementById(tab + '-view').classList.add('active');
     }
 
     function addNumber(val) {
-        triggerVibration(40);
+        triggerVibration(50); // Vibration courte au clic
         results.unshift(val);
         if(results.length > 5000) results.pop();
-        localStorage.setItem("mw_final_v15", JSON.stringify(results));
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
     function deleteLast() {
         if(results.length === 0) return;
-        triggerVibration(80);
+        triggerVibration(100); 
         results.shift();
-        localStorage.setItem("mw_final_v15", JSON.stringify(results));
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
-    function getStats(num) {
-        const last50 = results.slice(0, 50).filter(x => x === num).length;
-        const last100 = results.slice(0, 100).filter(x => x === num).length;
-        const currentDelay = results.indexOf(num);
-        let maxDelay = 0; let temp = 0;
-        for(let r of results) {
-            if(r === num) { if(temp > maxDelay) maxDelay = temp; temp = 0; } 
-            else { temp++; }
-        }
-        return { delay: currentDelay === -1 ? '?' : currentDelay, f50: last50, f100: last100, max: maxDelay };
-    }
-
     function updateUI() {
-        // MAJ HISTORIQUE TOTAL
-        const grid = document.getElementById("grid-content");
-        let html = "";
-        const data = currentTab === 'live' ? results.slice(0, 250) : results;
+        document.getElementById("grid-live").innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
         
-        data.forEach((n, i) => {
-            // Mise en valeur des numéros ST
-            const isST = [1, 2, 5, 8].includes(n) ? 'border: 1px solid var(--gold); color: var(--gold);' : '';
-            html += `<div class="res-item" style="${isST}"><span class="res-idx">${i+1}</span>${n}</div>`;
-        });
-        
-        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; padding-top:20px; font-size:10px; color:#555;'>AUCUNE DONNÉE</div>";
-        document.getElementById("tour-count").innerText = results.length + " TOURS";
-
-        // MAJ STATS BOUTONS
-        const targets = [1, 2, 5, 8];
-        let statHTML = "";
-        targets.forEach(t => {
-            const s = getStats(t);
-            statHTML += `
-                <div class="st-btn">
-                    <span class="st-label">ST ${t}</span>
-                    <span class="st-now">${s.delay}T</span>
-                    <span class="st-val">50t: ${s.f50} | 100t: ${s.f100}</span>
-                    <span class="st-val">MAX: ${s.max}</span>
-                </div>`;
-        });
-        document.getElementById("stat-container").innerHTML = statHTML;
-
-        // ALERTES
-        const az = document.getElementById("alert-zone");
-        let alerts = [];
-        [1,2,5,8].forEach(n => {
-            const d = results.indexOf(n);
-            const limit = n === 1 ? 12 : n === 2 ? 22 : 45;
-            if(d > limit && d !== -1) alerts.push(`${n}(${d}t)`);
-        });
-        if(alerts.length > 0) {
-            az.innerHTML = "⚠️ ALERTE ABSENCE : " + alerts.join(" | ");
-            az.classList.add("active-alert");
-        } else {
-            az.innerHTML = "ANALYSE EN COURS...";
-            az.classList.remove("active-alert");
+        let arcHTML = "";
+        for (let i = 0; i < results.length; i++) {
+            if (i > 0 && i % 1000 === 0) arcHTML += `<div class="sep-1000">PALIER ${i}</div>`;
+            else if (i > 0 && i % 500 === 0) arcHTML += `<div class="sep-500">ZONE ${i}</div>`;
+            arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
         }
+        document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
+        checkAlerts();
         updatePatterns();
     }
 
+    function checkAlerts() {
+        const az = document.getElementById("alert-zone");
+        let alerts = [];
+        const delays = { "1": results.indexOf(1), "2": results.indexOf(2), "5": results.indexOf(5), "8": results.indexOf(8) };
+        if(delays["1"] > 10) alerts.push("1 ("+delays["1"]+"t)");
+        if(delays["2"] > 20) alerts.push("2 ("+delays["2"]+"t)");
+        if(delays["5"] > 40) alerts.push("5 ("+delays["5"]+"t)");
+        if(delays["8"] > 40) alerts.push("8 ("+delays["8"]+"t)");
+
+        if(alerts.length > 0) {
+            az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
+            az.classList.add("active-alert");
+            beep(600, 100);
+            triggerVibration([100, 50, 100]); // Vibration d'alerte saccadée
+        } else {
+            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
+            az.classList.remove("active-alert");
+        }
+    }
+
+    function fullAnalysis(num) {
+        if(results.length === 0) return;
+        const currentDelay = results.indexOf(num);
+        let maxDelay = 0, tempDelay = 0;
+        for (let i = 0; i < results.length; i++) {
+            if (results[i] === num) {
+                if (tempDelay > maxDelay) maxDelay = tempDelay;
+                tempDelay = 0;
+            } else tempDelay++;
+        }
+        alert("N°" + num + " | Retard: " + currentDelay + " | Max: " + maxDelay);
+    }
+
     function updatePatterns() {
-        if(results.length < 6) return;
+        if(results.length < 10) return;
         let patterns = {};
         for(let i=0; i <= results.length - 5; i++) {
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 5);
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 10);
         document.getElementById("patternList").innerHTML = sorted.map(p => {
             let seq = p[0].split('-').reverse().join('→');
             return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
         }).join('');
     }
-
     window.onload = updateUI;
 </script>
 </body>
