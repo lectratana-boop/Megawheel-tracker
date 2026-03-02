@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v15.7 - Speed Mode</title>
+    <title>Megawheel Tracker v14.4</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -12,101 +12,103 @@
             --gold: #f1c40f;
             --white: #ffffff;
             --red: #ff4757;
-            --out-shadow: 4px 4px 8px #0d1220, -2px -2px 6px #23305c;
-            --in-shadow: inset 3px 3px 6px #0d1220, inset -1px -1px 4px #23305c;
+            --out-shadow: 8px 8px 16px #0d1220, -4px -4px 12px #23305c;
+            --in-shadow: inset 4px 4px 8px #0d1220, inset -2px -2px 6px #23305c;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 5px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 100%; max-width: 400px; background: var(--card); padding: 10px; border-radius: 15px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 6px; height: 98vh; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 480px; background: var(--card); padding: 15px; border-radius: 25px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; }
         
-        .app-header { text-align: center; border-bottom: 1px solid #23305c; padding-bottom: 2px; }
-        .app-title { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; margin: 0; }
+        /* Header sans photo */
+        .app-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #23305c; padding-bottom: 10px; }
+        .app-title { font-size: 1.3rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: 2px; }
+        .app-title span { color: var(--accent); }
 
-        /* ZONE ALERTE IA */
-        #alert-zone { min-height: 35px; background: rgba(255, 71, 87, 0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: var(--white); border: 1px solid #333; text-align: center; padding: 0 5px; transition: 0.3s; }
-        .active-alert { border-color: var(--red) !important; background: var(--red) !important; color: white !important; animation: blink-red 0.8s infinite; box-shadow: 0 0 15px var(--red); }
-        @keyframes blink-red { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+        .tab-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; background: var(--bg); color: #555; font-weight: bold; cursor: pointer; box-shadow: var(--out-shadow); font-size: 10px; }
+        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
 
-        /* VUES & HISTO */
-        .history-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 120px; }
-        .tabs { display: flex; gap: 3px; margin-bottom: 4px; }
-        .tab-btn { flex: 1; padding: 6px; border-radius: 6px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); }
-        .view-content { flex-grow: 1; background: var(--bg); border-radius: 8px; padding: 5px; overflow-y: auto; border: 1px solid #222; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 6px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; border: 1px solid #23305c; }
-        .res-idx { position: absolute; top: 0; left: 1px; font-size: 6px; color: #555; }
+        #alert-zone { min-height: 35px; background: rgba(255, 71, 87, 0.05); border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: var(--red); border: 1px solid #222; text-align: center; }
+        .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.3) !important; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.4; } }
 
-        /* STATS & PATTERNS */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-        .st-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); padding: 5px 0; border-radius: 5px; display: flex; flex-direction: column; align-items: center; font-size: 8px; }
-        .st-val { font-size: 11px; font-weight: 900; color: var(--accent); }
+        .header-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .input-3d { flex: 2; background: var(--bg); border-radius: 12px; box-shadow: var(--in-shadow); }
+        select { background: none; border: none; color: var(--accent); width: 100%; font-weight: bold; padding: 12px; font-size: 18px; outline: none; text-align: center; }
+        
+        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 11px; height: 45px; }
+        .add-btn { background: var(--accent); color: #1a1a2e; flex: 1.2; }
+        .del-btn { background: var(--red); color: white; flex: 0.8; }
 
-        .pattern-box { background: var(--bg); border-radius: 8px; padding: 6px; height: 70px; overflow-y: auto; border: 1px solid #23305c; }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 3px; text-transform: uppercase; border-bottom: 1px solid #23305c; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 2px 0; font-size: 8px;}
+        .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .analyser-btn { background: linear-gradient(145deg, #1e1e3f, #16213e); color: var(--gold); border: 1px solid var(--gold); }
 
-        /* PAVÉ NUMÉRIQUE (VIBRATION SUPPRIMÉE) */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-top: 5px; }
-        .num-btn { 
-            background: linear-gradient(145deg, #1e2a4a, #16213e);
-            border: 1px solid #23305c; color: var(--white);
-            font-size: 1.1rem; font-weight: 900; padding: 12px 0;
-            border-radius: 8px; cursor: pointer; box-shadow: var(--out-shadow);
-        }
-        .num-btn:active { background: var(--accent); color: black; }
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; grid-column: span 3; padding: 10px; margin-top: 2px; text-transform: uppercase; }
+        .view-content { display: none; background: var(--bg); border-radius: 15px; padding: 10px; height: 320px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #222; box-shadow: var(--in-shadow); }
+        .view-content.active { display: block; }
+
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        .res-item { background: var(--card); font-size: 10px; padding: 8px 0; text-align: center; border-radius: 4px; color: var(--accent); position: relative; font-weight: bold; }
+        .res-idx { position: absolute; top: -1px; left: 1px; font-size: 5px; color: #555; }
+
+        /* SÉPARATEURS VISUELS ARCHIVE */
+        .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 10px; font-weight: 900; text-align: center; padding: 8px; margin: 15px 0 5px 0; border-radius: 4px; text-transform: uppercase; }
+        .sep-1000 { grid-column: span 10; background: var(--red); color: #fff; font-size: 11px; font-weight: 900; text-align: center; padding: 10px; margin: 20px 0 5px 0; border-radius: 4px; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
+
+        .pattern-box { background: var(--bg); border-radius: 15px; padding: 12px; box-shadow: var(--in-shadow); min-height: 180px; border: 1px solid #23305c; }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 10px; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #23305c; padding-bottom: 5px;}
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 6px 0; font-size: 10px;}
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header"><h1 class="app-title">Megawheel <span>AI Tracker v15.7</span></h1></div>
-    
-    <div id="alert-zone">ANALYSE IA EN ATTENTE...</div>
-
-    <div class="history-container">
-        <div class="tabs">
-            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE VIEW</button>
-            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE</button>
-        </div>
-        <div id="live-view" class="view-content"><div id="grid-live" class="res-grid"></div></div>
-        <div id="archive-view" class="view-content" style="display:none;"><div id="grid-archive" class="res-grid"></div></div>
+    <div class="app-header">
+        <div class="app-title">Megawheel <span>Tracker</span></div>
     </div>
 
-    <div class="stat-grid" id="mini-stats">
-        </div>
+    <div class="tabs">
+        <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE (250)</button>
+        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">ARCHIVES (5000)</button>
+    </div>
+
+    <div id="alert-zone">SYSTÈME PRÊT</div>
+
+    <div class="header-row">
+        <div class="input-3d"><select id="numIn">
+            <option value="">N°</option>
+            <option>1</option><option>2</option><option>5</option><option>8</option><option>10</option><option>15</option><option>20</option><option>30</option><option>40</option>
+        </select></div>
+        <button class="btn add-btn" onclick="addNumber()">AJOUTER</button>
+        <button class="btn del-btn" onclick="deleteLast()">DEL</button>
+    </div>
+
+    <div class="stat-grid-4">
+        <button class="btn analyser-btn" onclick="fullAnalysis(1)">ST1</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(2)">ST2</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(5)">ST5</button>
+        <button class="btn analyser-btn" onclick="fullAnalysis(8)">ST8</button>
+    </div>
+
+    <div id="live-view" class="view-content active">
+        <div id="grid-live" class="res-grid"></div>
+    </div>
+
+    <div id="archive-view" class="view-content">
+        <div id="grid-archive" class="res-grid"></div>
+    </div>
 
     <div class="pattern-box">
-        <div class="pattern-title">DÉTECTION PATTERNS</div>
+        <div class="pattern-title">TOP PATTERNS (SÉQUENCES RÉPÉTÉES)</div>
         <div id="patternList"></div>
-    </div>
-
-    <div class="numpad">
-        <button class="num-btn" onclick="addNumber(1)">1</button>
-        <button class="num-btn" onclick="addNumber(2)">2</button>
-        <button class="num-btn" onclick="addNumber(5)">5</button>
-        <button class="num-btn" onclick="addNumber(8)">8</button>
-        <button class="num-btn" onclick="addNumber(10)">10</button>
-        <button class="num-btn" onclick="addNumber(15)">15</button>
-        <button class="num-btn" onclick="addNumber(20)">20</button>
-        <button class="num-btn" onclick="addNumber(30)">30</button>
-        <button class="num-btn" onclick="addNumber(40)">40</button>
-        <button class="del-btn" onclick="deleteLast()">EFFACER DERNIER TOUR</button>
     </div>
 </div>
 
 <script>
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
-    // Audio Context initialisé au premier clic pour bypasser les restrictions navigateurs
-    let audioCtx = null;
-
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    const values = [1,2,5,8,10,15,20,30,40];
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function beep(freq, dur) {
-        initAudio();
         if(audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -117,41 +119,47 @@
 
     function switchTab(tab) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('live-view').style.display = tab === 'live' ? 'block' : 'none';
-        document.getElementById('archive-view').style.display = tab === 'archive' ? 'block' : 'none';
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
         document.getElementById('btn-' + tab).classList.add('active');
+        document.getElementById(tab + '-view').classList.add('active');
     }
 
-    function addNumber(val) {
-        initAudio(); // Active le son
-        results.unshift(val);
+    function updateUI() {
+        // LIVE GRID
+        const liveGrid = document.getElementById("grid-live");
+        liveGrid.innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+
+        // ARCHIVE GRID AVEC SÉPARATEURS
+        const arcGrid = document.getElementById("grid-archive");
+        let arcHTML = "";
+        for (let i = 0; i < results.length; i++) {
+            if (i > 0 && i % 1000 === 0) arcHTML += `<div class="sep-1000">🚨 PALIER ${i} TOURS 🚨</div>`;
+            else if (i > 0 && i % 500 === 0) arcHTML += `<div class="sep-500">📍 ZONE ${i} TOURS</div>`;
+            arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
+        }
+        arcGrid.innerHTML = arcHTML || "<div style='grid-column: span 10; text-align:center; padding:20px; color:#444;'>Aucune donnée</div>";
+        
+        checkAlerts();
+        updatePatterns();
+    }
+
+    function addNumber() {
+        const val = document.getElementById("numIn").value;
+        if(!val) return;
+        results.unshift(parseInt(val));
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
+        document.getElementById("numIn").value = "";
     }
 
     function deleteLast() {
         if(results.length === 0) return;
-        results.shift();
-        localStorage.setItem("mw_final_v7", JSON.stringify(results));
-        updateUI();
-    }
-
-    function updateUI() {
-        // MAJ Grilles
-        document.getElementById("grid-live").innerHTML = results.slice(0, 200).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
-        
-        // MAJ Stats Rapides
-        const targets = [1, 2, 5, 8];
-        let statHTML = "";
-        targets.forEach(t => {
-            const delay = results.indexOf(t);
-            statHTML += `<div class="st-btn">ST ${t}<span class="st-val">${delay === -1 ? '?' : delay}</span></div>`;
-        });
-        document.getElementById("mini-stats").innerHTML = statHTML;
-
-        checkAlerts();
-        updatePatterns();
+        if(confirm("Effacer le tour " + results[0] + " ?")) {
+            results.shift();
+            localStorage.setItem("mw_final_v7", JSON.stringify(results));
+            updateUI();
+        }
     }
 
     function checkAlerts() {
@@ -159,19 +167,32 @@
         let alerts = [];
         const d1=results.indexOf(1), d2=results.indexOf(2), d5=results.indexOf(5), d8=results.indexOf(8);
         
-        if(d1 >= 10) alerts.push("1 ("+d1+"t)");
-        if(d2 >= 20) alerts.push("2 ("+d2+"t)");
-        if(d5 >= 40) alerts.push("5 ("+d5+"t)");
-        if(d8 >= 40) alerts.push("8 ("+d8+"t)");
+        if(d1 > 10) alerts.push("1 ("+d1+"t)");
+        if(d2 > 20) alerts.push("2 ("+d2+"t)");
+        if(d5 > 40) alerts.push("5 ("+d5+"t)");
+        if(d8 > 40) alerts.push("8 ("+d8+"t)");
 
         if(alerts.length > 0) {
-            az.innerHTML = "⚠️ URGENT : " + alerts.join(" | ");
+            az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
             az.classList.add("active-alert");
-            beep(440, 200); // Signal sonore d'alerte
+            beep(600, 150);
         } else {
-            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS ANALYSÉS";
+            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
             az.classList.remove("active-alert");
         }
+    }
+
+    function fullAnalysis(num) {
+        if(results.length === 0) return;
+        const currentDelay = results.indexOf(num);
+        let maxDelay = 0, tempDelay = 0, endIdx = 0;
+        for (let i = 0; i < results.length; i++) {
+            if (results[i] === num) {
+                if (tempDelay > maxDelay) { maxDelay = tempDelay; endIdx = i; }
+                tempDelay = 0;
+            } else tempDelay++;
+        }
+        alert("ANALYSE N°" + num + "\nRetard actuel: " + (currentDelay === -1 ? "N/A" : currentDelay) + "\nRecord d'absence: " + maxDelay + " tours");
     }
 
     function updatePatterns() {
@@ -181,7 +202,7 @@
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 6);
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 12);
         document.getElementById("patternList").innerHTML = sorted.map(p => {
             let seq = p[0].split('-').reverse().join('→');
             return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
