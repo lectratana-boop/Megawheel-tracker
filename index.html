@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v15.1 - Pro Stats</title>
+    <title>Megawheel Tracker v15.2 - Analysis Focus</title>
     <style>
         :root {
             --bg: #0a0e1a;
@@ -18,75 +18,72 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 5px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 100%; max-width: 420px; background: var(--card); padding: 8px; border-radius: 12px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; height: 98vh; }
+        .container { width: 100%; max-width: 420px; background: var(--card); padding: 8px; border-radius: 12px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; height: 98vh; gap: 4px; }
         
-        /* HEADER & ALERTES */
-        .app-header { text-align: center; margin-bottom: 4px; }
-        .app-title { font-size: 0.85rem; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-        #alert-zone { min-height: 22px; background: rgba(255, 71, 87, 0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: var(--red); border: 1px solid #333; margin-top: 4px; }
+        .app-header { text-align: center; }
+        .app-title { font-size: 0.85rem; font-weight: 900; text-transform: uppercase; margin: 0; color: var(--accent); }
+        
+        #alert-zone { min-height: 22px; background: rgba(255, 71, 87, 0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--red); border: 1px solid #333; }
         .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.25) !important; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* VUES DYNAMIQUE - OCCUPE LE MAX D'ESPACE */
-        .tabs { display: flex; gap: 4px; margin: 5px 0; }
-        .tab-btn { flex: 1; padding: 6px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; cursor: pointer; }
+        /* --- ZONE ANALYSE (HAUT - AGRANDIE) --- */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .st-btn { 
+            background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 6px; padding: 6px 2px;
+            display: flex; flex-direction: column; align-items: center; color: var(--gold); box-shadow: var(--out-shadow);
+        }
+        .st-btn .st-label { font-size: 10px; font-weight: 900; margin-bottom: 2px; }
+        .st-btn .st-now { font-size: 14px; font-weight: 900; color: var(--accent); }
+        .st-btn .st-val { font-size: 8px; color: #bbb; line-height: 1.1; }
+
+        .pattern-box { background: var(--bg); border-radius: 6px; padding: 6px; height: 110px; overflow-y: auto; border: 1px solid var(--accent); }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 9px; margin-bottom: 4px; text-transform: uppercase; border-bottom: 1px solid #1e2a4a; }
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 3px 0; font-size: 9px;}
+
+        /* --- ZONE HISTORIQUE (MILIEU - RÉDUITE) --- */
+        .history-section { flex-grow: 1; display: flex; flex-direction: column; min-height: 60px; }
+        .tabs { display: flex; gap: 4px; margin-bottom: 2px; }
+        .tab-btn { flex: 1; padding: 4px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 8px; font-weight: bold; cursor: pointer; }
         .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
         
-        .view-content { flex-grow: 1; background: var(--bg); border-radius: 6px; padding: 4px; overflow-y: auto; border: 1px solid #1e2a4a; min-height: 80px; }
+        .view-content { flex-grow: 1; background: var(--bg); border-radius: 4px; padding: 4px; overflow-y: auto; border: 1px solid #1e2a4a; max-height: 100px; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .res-item { background: var(--card); font-size: 9px; padding: 4px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; }
-        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
+        .res-item { background: var(--card); font-size: 9px; padding: 3px 0; text-align: center; border-radius: 2px; color: var(--accent); font-weight: bold; position: relative; }
 
-        /* BOUTONS STATS INTELLIGENTS */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 0; }
-        .st-btn { 
-            background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 6px; padding: 4px 2px;
-            display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--gold);
-        }
-        .st-btn .st-label { font-size: 8px; font-weight: 900; border-bottom: 1px solid rgba(241, 196, 15, 0.3); width: 100%; text-align: center; margin-bottom: 2px; }
-        .st-btn .st-val { font-size: 7px; color: #ddd; line-height: 1.2; text-align: left; width: 100%; padding-left: 2px; }
-        .st-btn .st-now { font-size: 10px; font-weight: bold; color: var(--accent); }
-
-        /* PATTERNS */
-        .pattern-box { background: var(--bg); border-radius: 6px; padding: 5px; height: 90px; overflow-y: auto; border: 1px solid #1e2a4a; margin-bottom: 5px; }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 3px; text-transform: uppercase; border-bottom: 1px solid #1e2a4a; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 2px 0; font-size: 8px;}
-
-        /* PAVÉ NUMÉRIQUE (OPTIMISÉ BAS) */
+        /* --- PAVÉ NUMÉRIQUE (BAS) --- */
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: auto; }
         .num-btn { 
             background: var(--btn-bg); border: 1px solid #1e2a4a; color: var(--white);
-            font-size: 1.1rem; font-weight: 900; padding: 10px 0;
+            font-size: 1.2rem; font-weight: 900; padding: 12px 0;
             border-radius: 6px; cursor: pointer; box-shadow: var(--out-shadow);
         }
         .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.96); color: var(--accent); }
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 9px; cursor: pointer; grid-column: span 3; padding: 7px; margin-top: 2px; text-transform: uppercase; }
-
-        /* SEPARATEURS ARCHIVE */
-        .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 7px; font-weight: 900; text-align: center; margin: 4px 0; padding: 2px; border-radius: 2px; }
+        .del-btn { background: var(--red); color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 10px; cursor: pointer; grid-column: span 3; padding: 10px; margin-top: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header"><h1 class="app-title">Megawheel <span>Tracker PRO</span></h1></div>
+    <div class="app-header"><h1 class="app-title">Megawheel Tracker PRO v15.2</h1></div>
+    
     <div id="alert-zone">SYSTÈME PRÊT</div>
 
-    <div class="tabs">
-        <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE VIEW</button>
-        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE (5000)</button>
-    </div>
-    
-    <div id="main-view" class="view-content">
-        <div id="grid-content" class="res-grid"></div>
-    </div>
-
-    <div class="stat-grid" id="stat-container">
-        </div>
+    <div class="stat-grid" id="stat-container"></div>
 
     <div class="pattern-box">
         <div class="pattern-title">DÉTECTION DE SÉQUENCES</div>
         <div id="patternList"></div>
+    </div>
+
+    <div class="history-section">
+        <div class="tabs">
+            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
+            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
+        </div>
+        <div id="main-view" class="view-content">
+            <div id="grid-content" class="res-grid"></div>
+        </div>
     </div>
 
     <div class="numpad">
@@ -99,14 +96,13 @@
         <button class="num-btn" onclick="addNumber(20)">20</button>
         <button class="num-btn" onclick="addNumber(30)">30</button>
         <button class="num-btn" onclick="addNumber(40)">40</button>
-        <button class="del-btn" onclick="deleteLast()">Correction : Effacer dernier tour</button>
+        <button class="del-btn" onclick="deleteLast()">EFFACER DERNIER TOUR</button>
     </div>
 </div>
 
 <script>
-    let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
+    let results = JSON.parse(localStorage.getItem("mw_final_v15")) || [];
     let currentTab = 'live';
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function triggerVibration(pattern) { if ("vibrate" in navigator) navigator.vibrate(pattern); }
 
@@ -121,7 +117,7 @@
         triggerVibration(40);
         results.unshift(val);
         if(results.length > 5000) results.pop();
-        localStorage.setItem("mw_final_v7", JSON.stringify(results));
+        localStorage.setItem("mw_final_v15", JSON.stringify(results));
         updateUI();
     }
 
@@ -129,7 +125,7 @@
         if(results.length === 0) return;
         triggerVibration(80);
         results.shift();
-        localStorage.setItem("mw_final_v7", JSON.stringify(results));
+        localStorage.setItem("mw_final_v15", JSON.stringify(results));
         updateUI();
     }
 
@@ -137,7 +133,6 @@
         const last50 = results.slice(0, 50).filter(x => x === num).length;
         const last100 = results.slice(0, 100).filter(x => x === num).length;
         const currentDelay = results.indexOf(num);
-        
         let maxDelay = 0; let temp = 0;
         for(let r of results) {
             if(r === num) { if(temp > maxDelay) maxDelay = temp; temp = 0; } 
@@ -147,53 +142,47 @@
     }
 
     function updateUI() {
-        // MAJ GRILLE
+        // MAJ GRILLE HISTO
         const grid = document.getElementById("grid-content");
         let html = "";
-        const data = currentTab === 'live' ? results.slice(0, 200) : results;
-        
+        const data = currentTab === 'live' ? results.slice(0, 100) : results;
         data.forEach((n, i) => {
-            if (currentTab === 'archive' && i > 0 && i % 500 === 0) html += `<div class="sep-500">ZONE ${i} TOURS</div>`;
-            html += `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`;
+            html += `<div class="res-item">${n}</div>`;
         });
-        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; font-size:10px; padding:20px;'>Aucun tour enregistré</div>";
+        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; font-size:9px;'>Vide</div>";
 
-        // MAJ STATS SUR BOUTONS
+        // MAJ STATS
         const targets = [1, 2, 5, 8];
         let statHTML = "";
         targets.forEach(t => {
             const s = getStats(t);
             statHTML += `
-                <div class="st-btn" onclick="alert('Détails ${t}: Record Abs ${s.max}')">
-                    <span class="st-label">ST ${t}</span>
-                    <span class="st-now">R: ${s.delay}</span>
+                <div class="st-btn">
+                    <span class="st-label">STAT ${t}</span>
+                    <span class="st-now">${s.delay}T</span>
                     <span class="st-val">50t: ${s.f50} | 100t: ${s.f100}</span>
                     <span class="st-val">MAX: ${s.max}</span>
                 </div>`;
         });
         document.getElementById("stat-container").innerHTML = statHTML;
 
-        checkAlerts();
-        updatePatterns();
-    }
-
-    function checkAlerts() {
+        // ALERTES
         const az = document.getElementById("alert-zone");
         let alerts = [];
         [1,2,5,8].forEach(n => {
             const d = results.indexOf(n);
             const limit = n === 1 ? 12 : n === 2 ? 22 : 45;
-            if(d > limit) alerts.push(`${n}(${d}t)`);
+            if(d > limit && d !== -1) alerts.push(`${n}(${d}t)`);
         });
-
         if(alerts.length > 0) {
             az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
             az.classList.add("active-alert");
-            triggerVibration([100, 50, 100]);
         } else {
             az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
             az.classList.remove("active-alert");
         }
+
+        updatePatterns();
     }
 
     function updatePatterns() {
