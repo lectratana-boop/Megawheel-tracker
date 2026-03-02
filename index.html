@@ -208,4 +208,17 @@
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 8);
+        document.getElementById("patternList").innerHTML = sorted.map(p => {
+            let seq = p[0].split('-').reverse().join('→');
+            return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
+        }).join('');
+    }
+
+    window.onload = () => {
+        updateUI();
+        switchTab('live');
+    };
+</script>
+</body>
+</html>
