@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v14.9 - Vibration Mode</title>
+    <title>Megawheel Tracker v14.8</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -27,15 +27,17 @@
         .active-alert { border-color: var(--red) !important; animation: blink 1s infinite; background: rgba(255, 71, 87, 0.3) !important; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
+        /* PAVÉ NUMÉRIQUE RÉDUIT À MOITIÉ */
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
         .num-btn { 
             background: linear-gradient(145deg, #1e2a4a, #16213e);
             border: 1px solid #23305c; color: var(--white);
-            font-size: 0.9rem; font-weight: 900; padding: 8px 0;
+            font-size: 0.9rem; font-weight: 900; padding: 6px 0;
             border-radius: 8px; cursor: pointer; box-shadow: var(--out-shadow);
         }
         .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
 
+        /* BOUTONS STATS RÉINTÉGRÉS */
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
         .st-btn { 
             background: #0f172a; border: 1px solid var(--gold); color: var(--gold);
@@ -46,9 +48,10 @@
         .tabs { display: flex; gap: 3px; }
         .tab-btn { flex: 1; padding: 6px; border-radius: 6px; border: none; background: var(--bg); color: #444; font-size: 8px; font-weight: bold; }
         .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 8px; cursor: pointer; }
+        .del-btn { background: var(--red); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 8px; cursor: pointer; opacity: 0.8; }
 
-        .view-content { display: none; background: var(--bg); border-radius: 8px; padding: 5px; height: 110px; overflow-y: auto; border: 1px solid #222; }
+        /* VUES */
+        .view-content { display: none; background: var(--bg); border-radius: 8px; padding: 5px; height: 120px; overflow-y: auto; border: 1px solid #222; }
         .view-content.active { display: block; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
         .res-item { background: var(--card); font-size: 9px; padding: 4px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; }
@@ -66,6 +69,7 @@
 
 <div class="container">
     <div class="app-header"><h1 class="app-title">Megawheel <span>Tracker</span></h1></div>
+
     <div id="alert-zone">SYSTÈME PRÊT</div>
 
     <div class="numpad">
@@ -108,13 +112,6 @@
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // Fonction de vibration universelle
-    function triggerVibration(pattern) {
-        if ("vibrate" in navigator) {
-            navigator.vibrate(pattern);
-        }
-    }
-
     function beep(freq, dur) {
         if(audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
@@ -132,7 +129,6 @@
     }
 
     function addNumber(val) {
-        triggerVibration(50); // Vibration courte au clic
         results.unshift(val);
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
@@ -141,7 +137,6 @@
 
     function deleteLast() {
         if(results.length === 0) return;
-        triggerVibration(100); 
         results.shift();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
@@ -174,7 +169,6 @@
             az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
             az.classList.add("active-alert");
             beep(600, 100);
-            triggerVibration([100, 50, 100]); // Vibration d'alerte saccadée
         } else {
             az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
             az.classList.remove("active-alert");
