@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker IA v15.9</title>
+    <title>Megawheel Tracker IA v16.5 - Math Logic</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -16,43 +16,21 @@
             --in-shadow: inset 3px 3px 6px #0d1220, inset -1px -1px 4px #23305c;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 420px; background: var(--card); padding: 15px; border-radius: 20px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 8px; }
         
         .app-header { text-align: center; border-bottom: 2px solid #23305c; padding-bottom: 5px; }
         .app-title { font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         .app-title span { color: var(--accent); }
 
-        /* ZONE ALERTE IA CRITIQUE */
         #alert-zone { 
-            min-height: 45px; 
-            background: rgba(255, 255, 255, 0.03); 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 12px; 
-            font-weight: 900; 
-            color: #444; 
-            border: 1px solid #222; 
-            text-align: center;
-            padding: 0 10px;
-            transition: all 0.2s linear;
+            min-height: 45px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 12px; font-weight: 900; color: #444; border: 1px solid #222; text-align: center;
         }
-        .active-alert { 
-            background: var(--red) !important; 
-            color: white !important; 
-            border-color: #fff !important;
-            animation: alert-flash 0.5s infinite; 
-            box-shadow: 0 0 20px rgba(255, 71, 87, 0.8);
-        }
-        @keyframes alert-flash { 
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
+        .active-alert { background: var(--red) !important; color: white !important; animation: alert-flash 0.5s infinite; }
+        @keyframes alert-flash { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* PAVÉ NUMÉRIQUE ERGONOMIQUE */
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 5px 0; }
         .num-btn { 
             background: linear-gradient(145deg, #1e2a4a, #16213e);
@@ -65,34 +43,42 @@
         
         .del-btn { 
             grid-column: span 3; background: #2c3e50; color: #bdc3c7; border: none; 
-            border-radius: 12px; font-weight: bold; font-size: 12px; padding: 12px;
-            cursor: pointer; text-transform: uppercase; margin-top: 5px;
+            border-radius: 12px; font-weight: bold; font-size: 11px; padding: 12px;
+            cursor: pointer; text-transform: uppercase;
         }
 
-        /* STATS & VUES */
-        .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 5px; }
-        .analyser-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; font-weight: bold; padding: 10px 0; border-radius: 8px; cursor: pointer; }
+        .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .analyser-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; font-weight: bold; padding: 10px 0; border-radius: 8px; }
 
-        .tabs { display: flex; gap: 5px; margin-top: 5px; }
-        .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--bg); color: #555; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); box-shadow: var(--in-shadow); }
+        .tabs { display: flex; gap: 5px; }
+        .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--bg); color: #555; font-size: 10px; font-weight: bold; }
+        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); }
 
-        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 10px; height: 180px; overflow-y: auto; border: 1px solid #222; }
+        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 10px; height: 160px; overflow-y: auto; border: 1px solid #222; }
         .view-content.active { display: block; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 7px 0; text-align: center; border-radius: 4px; color: var(--accent); font-weight: bold; position: relative; border: 1px solid #23305c; }
-        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
+        .res-item { background: var(--card); font-size: 10px; padding: 7px 0; text-align: center; border-radius: 4px; color: var(--accent); font-weight: bold; position: relative; }
 
-        .pattern-box { background: var(--bg); border-radius: 12px; padding: 10px; height: 110px; overflow-y: auto; border: 1px solid #23305c; margin-top: 5px; }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 9px; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #23305c; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 4px 0; font-size: 10px;}
+        /* PREDICTOR STYLISE */
+        .predictor-box { 
+            background: linear-gradient(180deg, #0a0a1a 0%, #16213e 100%); 
+            border-radius: 15px; padding: 15px; border: 1px solid var(--accent); 
+            margin-top: 5px; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+        }
+        .predictor-title { color: var(--accent); text-align: center; font-weight: 900; font-size: 12px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .predictor-results { display: flex; flex-direction: column; gap: 10px; }
+        .pred-line { display: flex; align-items: center; gap: 10px; }
+        .pred-label { width: 60px; font-weight: bold; font-size: 12px; color: var(--white); }
+        .pred-bar-container { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .pred-bar-fill { height: 100%; background: var(--accent); transition: width 0.5s ease-out; }
+        .pred-val { width: 45px; text-align: right; color: var(--gold); font-weight: bold; font-family: monospace; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Tracker Final</span></h1>
+        <h1 class="app-title">Megawheel <span>Logic Predictor</span></h1>
     </div>
 
     <div class="numpad">
@@ -105,10 +91,10 @@
         <button class="num-btn" onclick="quickAdd(20)">20</button>
         <button class="num-btn" onclick="quickAdd(30)">30</button>
         <button class="num-btn" onclick="quickAdd(40)">40</button>
-        <button class="del-btn" onclick="deleteLast()">CORRIGER / EFFACER DERNIER</button>
+        <button class="del-btn" onclick="deleteLast()">EFFACER DERNIÈRE ENTRÉE</button>
     </div>
 
-    <div id="alert-zone">ANALYSEUR IA ACTIF</div>
+    <div id="alert-zone">INITIALISATION MATHÉMATIQUE...</div>
 
     <div class="stat-grid-4">
         <button class="analyser-btn" onclick="fullAnalysis(1)">ST 1</button>
@@ -118,16 +104,18 @@
     </div>
 
     <div class="tabs">
-        <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE VIEW</button>
-        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE</button>
+        <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
+        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
     </div>
 
     <div id="live-view" class="view-content active"><div id="grid-live" class="res-grid"></div></div>
     <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
-    <div class="pattern-box">
-        <div class="pattern-title">DÉTECTION DE SÉQUENCES (TOP PATTERNS)</div>
-        <div id="patternList"></div>
+    <div class="predictor-box">
+        <div class="predictor-title">LOGICAL PREDICTOR (%)</div>
+        <div id="predictorDisplay" class="predictor-results">
+            <div style="text-align:center; color:#444; font-size:10px;">En attente d'analyse...</div>
+        </div>
     </div>
 </div>
 
@@ -156,7 +144,6 @@
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
-        // Saisie silencieuse comme demandé
     }
 
     function deleteLast() {
@@ -167,78 +154,89 @@
     }
 
     function updateUI() {
-        // MAJ Grille Live
-        document.getElementById("grid-live").innerHTML = results.slice(0, 250).map((n, i) => 
-            `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`
+        document.getElementById("grid-live").innerHTML = results.slice(0, 200).map((n, i) => 
+            `<div class="res-item"><span style="position:absolute;top:0;left:1px;font-size:5px;color:#555;">${i + 1}</span>${n}</div>`
         ).join('');
         
-        // MAJ Grille Archive
         let arcHTML = "";
         for (let i = 0; i < results.length; i++) {
-            if (i > 0 && i % 500 === 0) arcHTML += `<div style="grid-column: span 10; background:var(--gold); color:black; font-size:9px; font-weight:bold; text-align:center; padding:5px; margin:10px 0; border-radius:4px;">PALIER ${i} TOURS</div>`;
-            arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
+            if (i > 0 && i % 500 === 0) arcHTML += `<div style="grid-column: span 10; background:var(--gold); color:black; font-size:9px; font-weight:bold; text-align:center; padding:3px; margin:5px 0;">ZONE ${i}</div>`;
+            arcHTML += `<div class="res-item">${results[i]}</div>`;
         }
-        document.getElementById("grid-archive").innerHTML = arcHTML || "Aucune donnée";
+        document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
         
         checkAlerts();
-        updatePatterns();
+        calculateLogicalPredictor();
     }
 
     function checkAlerts() {
         const az = document.getElementById("alert-zone");
         let alerts = [];
-        
-        // Surveillance IA des retards
-        const d1 = results.indexOf(1);
-        const d2 = results.indexOf(2);
-        const d5 = results.indexOf(5);
-        const d8 = results.indexOf(8);
-        
-        // Définition des seuils critiques
-        if(d1 >= 10) alerts.push("1 (" + d1 + "t)");
-        if(d2 >= 20) alerts.push("2 (" + d2 + "t)");
-        if(d5 >= 40) alerts.push("5 (" + d5 + "t)");
-        if(d8 >= 40) alerts.push("8 (" + d8 + "t)");
+        const thresholds = {1:10, 2:20, 5:40, 8:40};
+        [1, 2, 5, 8].forEach(n => {
+            let delay = results.indexOf(n);
+            if(delay >= thresholds[n]) alerts.push(`${n} (${delay}t)`);
+        });
 
         if(alerts.length > 0) {
-            az.innerHTML = "⚠️ ALERTE IA : " + alerts.join(" | ");
+            az.innerHTML = "🚨 ALERTE RETARD : " + alerts.join(" | ");
             az.classList.add("active-alert");
-            beep(550, 250); // Bip sonore d'alerte maintenu
+            beep(550, 200);
         } else {
-            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS ANALYSÉS";
+            az.innerHTML = "LOGIQUE RNG ANALYSÉE • " + results.length + " TOURS";
             az.classList.remove("active-alert");
         }
     }
 
-    function fullAnalysis(num) {
-        if(results.length === 0) return;
-        const currentDelay = results.indexOf(num);
-        let maxDelay = 0, tempDelay = 0;
-        for (let i = 0; i < results.length; i++) {
-            if (results[i] === num) {
-                if (tempDelay > maxDelay) maxDelay = tempDelay;
-                tempDelay = 0;
-            } else tempDelay++;
-        }
-        alert("CHIFFRE " + num + "\n\nRetard actuel : " + (currentDelay === -1 ? "N/A" : currentDelay) + " tours\nRecord d'absence : " + maxDelay + " tours");
+    function calculateLogicalPredictor() {
+        if (results.length < 10) return;
+
+        // Étape 1 : Calcul des fréquences réelles
+        let counts = {};
+        results.forEach(val => counts[val] = (counts[val] || 0) + 1);
+
+        // Étape 2 : Pondération logique (Fréquence + Écart récent)
+        // On donne plus de poids aux numéros qui apparaissent souvent ET à ceux qui ont un retard anormal
+        let logicScores = [];
+        const allNums = [1, 2, 5, 8, 10, 15, 20, 30, 40];
+
+        allNums.forEach(num => {
+            let freq = (counts[num] || 0) / results.length;
+            let delay = results.indexOf(num);
+            if(delay === -1) delay = 100;
+            
+            // Score logique = (Fréquence brute * 100) + (Bonus de retard pour inciter le retour à la moyenne)
+            let score = (freq * 100) + (delay * 0.5);
+            logicScores.push({ num, score });
+        });
+
+        // Étape 3 : Sélection du Top 3
+        let top3 = logicScores.sort((a, b) => b.score - a.score).slice(0, 3);
+        let totalScore = top3.reduce((a, b) => a + b.score, 0);
+
+        // Étape 4 : Affichage avec calcul 100% strict
+        let p1 = Math.round((top3[0].score / totalScore) * 100);
+        let p2 = Math.round((top3[1].score / totalScore) * 100);
+        let p3 = 100 - (p1 + p2);
+
+        let html = top3.map((item, i) => {
+            let p = i === 0 ? p1 : (i === 1 ? p2 : p3);
+            return `
+                <div class="pred-line">
+                    <span class="pred-label">Num ${item.num}</span>
+                    <div class="pred-bar-container"><div class="pred-bar-fill" style="width: ${p}%"></div></div>
+                    <span class="pred-val">${p}%</span>
+                </div>
+            `;
+        }).join('');
+        
+        document.getElementById("predictorDisplay").innerHTML = html;
     }
 
-    function updatePatterns() {
-        if(results.length < 10) return;
-        let patterns = {};
-        for(let i=0; i <= results.length - 5; i++) {
-            let p = results.slice(i, i+5).join("-");
-            patterns[p] = (patterns[p] || 0) + 1;
-        }
-        let sorted = Object.entries(patterns)
-            .filter(p => p[1] > 1)
-            .sort((a,b) => b[1] - a[1])
-            .slice(0, 8);
-            
-        document.getElementById("patternList").innerHTML = sorted.map(p => {
-            let seq = p[0].split('-').reverse().join(' → ');
-            return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
-        }).join('');
+    function fullAnalysis(num) {
+        if(results.length === 0) return;
+        const delay = results.indexOf(num);
+        alert(`Analyse Numéro ${num}\nRetard : ${delay === -1 ? 'Jamais' : delay} tours\nLogique : Surveiller si retard > ${num === 1 ? 10 : 30}`);
     }
 
     window.onload = updateUI;
