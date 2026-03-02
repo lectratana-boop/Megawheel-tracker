@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v14.6 - Pad Mode</title>
+    <title>Megawheel Tracker v14.9 - Vibration Mode</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -12,96 +12,94 @@
             --gold: #f1c40f;
             --white: #ffffff;
             --red: #ff4757;
-            --out-shadow: 6px 6px 12px #0d1220, -3px -3px 9px #23305c;
-            --in-shadow: inset 3px 3px 6px #0d1220, inset -2px -2px 5px #23305c;
+            --out-shadow: 4px 4px 8px #0d1220, -2px -2px 6px #23305c;
+            --in-shadow: inset 3px 3px 6px #0d1220, inset -1px -1px 4px #23305c;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 100%; max-width: 450px; background: var(--card); padding: 12px; border-radius: 20px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 8px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 5px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        .container { width: 100%; max-width: 400px; background: var(--card); padding: 10px; border-radius: 15px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 5px; }
         
-        .app-header { text-align: center; border-bottom: 1px solid #23305c; padding-bottom: 5px; }
-        .app-title { font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .app-header { text-align: center; border-bottom: 1px solid #23305c; padding-bottom: 2px; }
+        .app-title { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; margin: 0; }
         .app-title span { color: var(--accent); }
 
-        /* ALERT ZONE */
-        #alert-zone { min-height: 30px; background: rgba(255, 71, 87, 0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--red); border: 1px solid #222; text-align: center; }
-        .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.25) !important; animation: blink 1s infinite; }
+        #alert-zone { min-height: 25px; background: rgba(255, 71, 87, 0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: var(--red); border: 1px solid #333; text-align: center; }
+        .active-alert { border-color: var(--red) !important; animation: blink 1s infinite; background: rgba(255, 71, 87, 0.3) !important; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* PAVÉ NUMÉRIQUE (Calculatrice style) */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 5px; }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
         .num-btn { 
             background: linear-gradient(145deg, #1e2a4a, #16213e);
             border: 1px solid #23305c; color: var(--white);
-            font-size: 1.4rem; font-weight: 900; padding: 12px 0;
-            border-radius: 12px; cursor: pointer; box-shadow: var(--out-shadow);
-            transition: 0.1s; display: flex; flex-direction: column; align-items: center;
+            font-size: 0.9rem; font-weight: 900; padding: 8px 0;
+            border-radius: 8px; cursor: pointer; box-shadow: var(--out-shadow);
         }
-        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.96); color: var(--accent); border-color: var(--accent); }
-        .num-btn span { font-size: 7px; color: var(--gold); text-transform: uppercase; margin-top: 2px; }
+        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
 
-        /* ACTIONS SECONDAIRES */
-        .action-row { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; }
-        .tabs { display: flex; gap: 5px; }
-        .tab-btn { flex: 1; padding: 8px; border-radius: 8px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; box-shadow: var(--out-shadow); }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .st-btn { 
+            background: #0f172a; border: 1px solid var(--gold); color: var(--gold);
+            font-size: 8px; font-weight: bold; padding: 5px 0; border-radius: 5px; cursor: pointer;
+        }
+
+        .action-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 5px; }
+        .tabs { display: flex; gap: 3px; }
+        .tab-btn { flex: 1; padding: 6px; border-radius: 6px; border: none; background: var(--bg); color: #444; font-size: 8px; font-weight: bold; }
         .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; }
+        .del-btn { background: var(--red); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 8px; cursor: pointer; }
 
-        /* HISTORIQUE ET PATTERNS */
-        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 8px; height: 160px; overflow-y: auto; border: 1px solid #222; box-shadow: var(--in-shadow); }
+        .view-content { display: none; background: var(--bg); border-radius: 8px; padding: 5px; height: 110px; overflow-y: auto; border: 1px solid #222; }
         .view-content.active { display: block; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 6px 0; text-align: center; border-radius: 4px; color: var(--accent); position: relative; font-weight: bold; }
-        .res-idx { position: absolute; top: -1px; left: 1px; font-size: 5px; color: #555; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+        .res-item { background: var(--card); font-size: 9px; padding: 4px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; }
+        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
 
-        .pattern-box { background: var(--bg); border-radius: 12px; padding: 10px; height: 120px; overflow-y: auto; border: 1px solid #23305c; }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 9px; margin-bottom: 5px; text-transform: uppercase; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 4px 0; font-size: 9px;}
+        .pattern-box { background: var(--bg); border-radius: 8px; padding: 6px; flex: 1; overflow-y: auto; border: 1px solid #23305c; }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 3px; text-transform: uppercase; border-bottom: 1px solid #23305c; }
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 2px 0; font-size: 8px;}
 
-        /* SEPARATEURS */
-        .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 9px; font-weight: 900; text-align: center; padding: 4px; margin: 10px 0; border-radius: 4px; }
-        .sep-1000 { grid-column: span 10; background: var(--red); color: #fff; font-size: 10px; font-weight: 900; text-align: center; padding: 6px; margin: 12px 0; border-radius: 4px; }
+        .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 7px; font-weight: 900; text-align: center; margin: 5px 0; padding: 2px; }
+        .sep-1000 { grid-column: span 10; background: var(--red); color: #fff; font-size: 8px; font-weight: 900; text-align: center; margin: 7px 0; padding: 3px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Tracker</span></h1>
-    </div>
-
+    <div class="app-header"><h1 class="app-title">Megawheel <span>Tracker</span></h1></div>
     <div id="alert-zone">SYSTÈME PRÊT</div>
 
     <div class="numpad">
-        <button class="num-btn" onclick="addNumber(1)">1<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(2)">2<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(5)">5<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(8)">8<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(10)">10<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(15)">15<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(20)">20<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(30)">30<span>Add</span></button>
-        <button class="num-btn" onclick="addNumber(40)">40<span>Add</span></button>
+        <button class="num-btn" onclick="addNumber(1)">1</button>
+        <button class="num-btn" onclick="addNumber(2)">2</button>
+        <button class="num-btn" onclick="addNumber(5)">5</button>
+        <button class="num-btn" onclick="addNumber(8)">8</button>
+        <button class="num-btn" onclick="addNumber(10)">10</button>
+        <button class="num-btn" onclick="addNumber(15)">15</button>
+        <button class="num-btn" onclick="addNumber(20)">20</button>
+        <button class="num-btn" onclick="addNumber(30)">30</button>
+        <button class="num-btn" onclick="addNumber(40)">40</button>
+    </div>
+
+    <div class="stat-grid">
+        <button class="st-btn" onclick="fullAnalysis(1)">ST 1</button>
+        <button class="st-btn" onclick="fullAnalysis(2)">ST 2</button>
+        <button class="st-btn" onclick="fullAnalysis(5)">ST 5</button>
+        <button class="st-btn" onclick="fullAnalysis(8)">ST 8</button>
     </div>
 
     <div class="action-row">
-        <button class="del-btn" onclick="deleteLast()">SUPPRIMER DERNIER</button>
+        <button class="del-btn" onclick="deleteLast()">EFFACER</button>
         <div class="tabs">
             <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
-            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">ARCHIVES</button>
+            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
         </div>
     </div>
 
-    <div id="live-view" class="view-content active">
-        <div id="grid-live" class="res-grid"></div>
-    </div>
-
-    <div id="archive-view" class="view-content">
-        <div id="grid-archive" class="res-grid"></div>
-    </div>
+    <div id="live-view" class="view-content active"><div id="grid-live" class="res-grid"></div></div>
+    <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="pattern-box">
-        <div class="pattern-title">TOP PATTERNS (SÉQUENCES DE 5)</div>
+        <div class="pattern-title">TOP PATTERNS</div>
         <div id="patternList"></div>
     </div>
 </div>
@@ -109,6 +107,13 @@
 <script>
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Fonction de vibration universelle
+    function triggerVibration(pattern) {
+        if ("vibrate" in navigator) {
+            navigator.vibrate(pattern);
+        }
+    }
 
     function beep(freq, dur) {
         if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -127,6 +132,7 @@
     }
 
     function addNumber(val) {
+        triggerVibration(50); // Vibration courte au clic
         results.unshift(val);
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
@@ -135,26 +141,22 @@
 
     function deleteLast() {
         if(results.length === 0) return;
-        if(confirm("Supprimer le tour " + results[0] + " ?")) {
-            results.shift();
-            localStorage.setItem("mw_final_v7", JSON.stringify(results));
-            updateUI();
-        }
+        triggerVibration(100); 
+        results.shift();
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
+        updateUI();
     }
 
     function updateUI() {
-        const liveGrid = document.getElementById("grid-live");
-        liveGrid.innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
-
-        const arcGrid = document.getElementById("grid-archive");
+        document.getElementById("grid-live").innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+        
         let arcHTML = "";
         for (let i = 0; i < results.length; i++) {
-            if (i > 0 && i % 1000 === 0) arcHTML += `<div class="sep-1000">🚨 PALIER ${i} TOURS</div>`;
-            else if (i > 0 && i % 500 === 0) arcHTML += `<div class="sep-500">📍 ZONE ${i} TOURS</div>`;
+            if (i > 0 && i % 1000 === 0) arcHTML += `<div class="sep-1000">PALIER ${i}</div>`;
+            else if (i > 0 && i % 500 === 0) arcHTML += `<div class="sep-500">ZONE ${i}</div>`;
             arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
         }
-        arcGrid.innerHTML = arcHTML || "<div style='text-align:center; padding:20px; color:#444;'>Vide</div>";
-        
+        document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
         checkAlerts();
         updatePatterns();
     }
@@ -162,21 +164,34 @@
     function checkAlerts() {
         const az = document.getElementById("alert-zone");
         let alerts = [];
-        const d1=results.indexOf(1), d2=results.indexOf(2), d5=results.indexOf(5), d8=results.indexOf(8);
-        
-        if(d1 > 10) alerts.push("1 ("+d1+"t)");
-        if(d2 > 20) alerts.push("2 ("+d2+"t)");
-        if(d5 > 40) alerts.push("5 ("+d5+"t)");
-        if(d8 > 40) alerts.push("8 ("+d8+"t)");
+        const delays = { "1": results.indexOf(1), "2": results.indexOf(2), "5": results.indexOf(5), "8": results.indexOf(8) };
+        if(delays["1"] > 10) alerts.push("1 ("+delays["1"]+"t)");
+        if(delays["2"] > 20) alerts.push("2 ("+delays["2"]+"t)");
+        if(delays["5"] > 40) alerts.push("5 ("+delays["5"]+"t)");
+        if(delays["8"] > 40) alerts.push("8 ("+delays["8"]+"t)");
 
         if(alerts.length > 0) {
             az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
             az.classList.add("active-alert");
             beep(600, 100);
+            triggerVibration([100, 50, 100]); // Vibration d'alerte saccadée
         } else {
-            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS ANALYSÉS";
+            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
             az.classList.remove("active-alert");
         }
+    }
+
+    function fullAnalysis(num) {
+        if(results.length === 0) return;
+        const currentDelay = results.indexOf(num);
+        let maxDelay = 0, tempDelay = 0;
+        for (let i = 0; i < results.length; i++) {
+            if (results[i] === num) {
+                if (tempDelay > maxDelay) maxDelay = tempDelay;
+                tempDelay = 0;
+            } else tempDelay++;
+        }
+        alert("N°" + num + " | Retard: " + currentDelay + " | Max: " + maxDelay);
     }
 
     function updatePatterns() {
@@ -186,13 +201,12 @@
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 8);
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 10);
         document.getElementById("patternList").innerHTML = sorted.map(p => {
             let seq = p[0].split('-').reverse().join('→');
             return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
         }).join('');
     }
-
     window.onload = updateUI;
 </script>
 </body>
