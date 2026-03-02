@@ -3,76 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker v15.6</title>
+    <title>Megawheel Tracker v15.1 - Pro Stats</title>
     <style>
         :root {
-            --bg: #1a1a2e;
+            --bg: #0a0e1a;
             --card: #16213e;
             --accent: #00ffcc;
             --gold: #f1c40f;
             --white: #ffffff;
             --red: #ff4757;
-            --out-shadow: 4px 4px 8px #0d1220, -2px -2px 6px #23305c;
-            --in-shadow: inset 3px 3px 6px #0d1220, inset -1px -1px 4px #23305c;
+            --btn-bg: linear-gradient(145deg, #1e2a4a, #16213e);
+            --out-shadow: 4px 4px 8px #050810, -2px -2px 6px #1e2a4a;
+            --in-shadow: inset 2px 2px 5px #050810, inset -1px -1px 3px #1e2a4a;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 5px; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 100%; max-width: 400px; background: var(--card); padding: 10px; border-radius: 15px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 6px; height: 98vh; }
+        .container { width: 100%; max-width: 420px; background: var(--card); padding: 8px; border-radius: 12px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; height: 98vh; }
         
-        .app-header { text-align: center; border-bottom: 1px solid #23305c; padding-bottom: 2px; }
-        .app-title { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; margin: 0; }
-        .app-title span { color: var(--accent); }
-
-        #alert-zone { min-height: 25px; background: rgba(255, 71, 87, 0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--red); border: 1px solid #333; }
-        .active-alert { border-color: var(--red) !important; animation: blink 1s infinite; background: rgba(255, 71, 87, 0.3) !important; }
+        /* HEADER & ALERTES */
+        .app-header { text-align: center; margin-bottom: 4px; }
+        .app-title { font-size: 0.85rem; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+        #alert-zone { min-height: 22px; background: rgba(255, 71, 87, 0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: var(--red); border: 1px solid #333; margin-top: 4px; }
+        .active-alert { border-color: var(--red) !important; background: rgba(255, 71, 87, 0.25) !important; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* PAVÉ NUMÉRIQUE */
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-        .num-btn { 
-            background: linear-gradient(145deg, #1e2a4a, #16213e);
-            border: 1px solid #23305c; color: var(--white);
-            font-size: 1.1rem; font-weight: 900; padding: 10px 0;
-            border-radius: 8px; cursor: pointer; box-shadow: var(--out-shadow);
-        }
-        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
+        /* VUES DYNAMIQUE - OCCUPE LE MAX D'ESPACE */
+        .tabs { display: flex; gap: 4px; margin: 5px 0; }
+        .tab-btn { flex: 1; padding: 6px; border-radius: 4px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
+        
+        .view-content { flex-grow: 1; background: var(--bg); border-radius: 6px; padding: 4px; overflow-y: auto; border: 1px solid #1e2a4a; min-height: 80px; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+        .res-item { background: var(--card); font-size: 9px; padding: 4px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; }
+        .res-idx { position: absolute; top: 0; left: 1px; font-size: 5px; color: #555; }
 
         /* BOUTONS STATS INTELLIGENTS */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 0; }
         .st-btn { 
-            background: #0f172a; border: 1px solid var(--gold); color: var(--gold);
-            padding: 4px 2px; border-radius: 5px; text-align: center; display: flex; flex-direction: column; gap: 1px;
+            background: var(--btn-bg); border: 1px solid var(--gold); border-radius: 6px; padding: 4px 2px;
+            display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--gold);
         }
-        .st-name { font-size: 9px; font-weight: 900; border-bottom: 1px solid rgba(241, 196, 15, 0.3); padding-bottom: 1px; margin-bottom: 2px; }
-        .st-main { font-size: 11px; font-weight: bold; color: var(--accent); }
-        .st-sub { font-size: 7px; color: #aaa; line-height: 1.1; }
-
-        /* ACTIONS & TABS */
-        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; align-items: center; }
-        .tabs { display: flex; gap: 3px; }
-        .tab-btn { flex: 1; padding: 8px; border-radius: 6px; border: none; background: var(--bg); color: #555; font-size: 9px; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--accent); box-shadow: var(--in-shadow); border: 1px solid var(--accent); }
-        .del-btn { background: var(--red); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 9px; cursor: pointer; padding: 8px; text-transform: uppercase; }
-
-        /* ZONE HISTORIQUE (UTILISE TOUT L'ESPACE BAS) */
-        .history-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 150px; }
-        .view-content { flex-grow: 1; background: var(--bg); border-radius: 8px; padding: 5px; overflow-y: auto; border: 1px solid #222; }
-        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 6px 0; text-align: center; border-radius: 3px; color: var(--accent); font-weight: bold; position: relative; border: 1px solid #23305c; }
-        .res-idx { position: absolute; top: 0; left: 1px; font-size: 6px; color: #555; }
+        .st-btn .st-label { font-size: 8px; font-weight: 900; border-bottom: 1px solid rgba(241, 196, 15, 0.3); width: 100%; text-align: center; margin-bottom: 2px; }
+        .st-btn .st-val { font-size: 7px; color: #ddd; line-height: 1.2; text-align: left; width: 100%; padding-left: 2px; }
+        .st-btn .st-now { font-size: 10px; font-weight: bold; color: var(--accent); }
 
         /* PATTERNS */
-        .pattern-box { background: var(--bg); border-radius: 8px; padding: 6px; height: 80px; overflow-y: auto; border: 1px solid #23305c; margin-top: 2px; }
-        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 3px; text-transform: uppercase; border-bottom: 1px solid #23305c; }
-        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 2px 0; font-size: 8px;}
+        .pattern-box { background: var(--bg); border-radius: 6px; padding: 5px; height: 90px; overflow-y: auto; border: 1px solid #1e2a4a; margin-bottom: 5px; }
+        .pattern-title { color: var(--accent); text-align: center; font-weight: bold; font-size: 8px; margin-bottom: 3px; text-transform: uppercase; border-bottom: 1px solid #1e2a4a; }
+        .pattern-line { display: flex; justify-content: space-between; border-bottom: 1px solid #111; padding: 2px 0; font-size: 8px;}
+
+        /* PAVÉ NUMÉRIQUE (OPTIMISÉ BAS) */
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: auto; }
+        .num-btn { 
+            background: var(--btn-bg); border: 1px solid #1e2a4a; color: var(--white);
+            font-size: 1.1rem; font-weight: 900; padding: 10px 0;
+            border-radius: 6px; cursor: pointer; box-shadow: var(--out-shadow);
+        }
+        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.96); color: var(--accent); }
+        .del-btn { background: var(--red); color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 9px; cursor: pointer; grid-column: span 3; padding: 7px; margin-top: 2px; text-transform: uppercase; }
+
+        /* SEPARATEURS ARCHIVE */
+        .sep-500 { grid-column: span 10; background: var(--gold); color: #000; font-size: 7px; font-weight: 900; text-align: center; margin: 4px 0; padding: 2px; border-radius: 2px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header"><h1 class="app-title">Megawheel <span>Tracker PRO v15.6</span></h1></div>
+    <div class="app-header"><h1 class="app-title">Megawheel <span>Tracker PRO</span></h1></div>
+    <div id="alert-zone">SYSTÈME PRÊT</div>
 
-    <div id="alert-zone">DÉMARRAGE...</div>
+    <div class="tabs">
+        <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE VIEW</button>
+        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORIQUE (5000)</button>
+    </div>
+    
+    <div id="main-view" class="view-content">
+        <div id="grid-content" class="res-grid"></div>
+    </div>
+
+    <div class="stat-grid" id="stat-container">
+        </div>
+
+    <div class="pattern-box">
+        <div class="pattern-title">DÉTECTION DE SÉQUENCES</div>
+        <div id="patternList"></div>
+    </div>
 
     <div class="numpad">
         <button class="num-btn" onclick="addNumber(1)">1</button>
@@ -84,42 +99,26 @@
         <button class="num-btn" onclick="addNumber(20)">20</button>
         <button class="num-btn" onclick="addNumber(30)">30</button>
         <button class="num-btn" onclick="addNumber(40)">40</button>
-    </div>
-
-    <div class="stat-grid" id="stat-container">
-        </div>
-
-    <div class="action-row">
-        <button class="del-btn" onclick="deleteLast()">CORRIGER (DEL)</button>
-        <div class="tabs">
-            <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE (250)</button>
-            <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
-        </div>
-    </div>
-
-    <div class="history-container">
-        <div id="live-view" class="view-content"><div id="grid-live" class="res-grid"></div></div>
-        <div id="archive-view" class="view-content" style="display:none;"><div id="grid-archive" class="res-grid"></div></div>
-    </div>
-
-    <div class="pattern-box">
-        <div class="pattern-title">TOP PATTERNS</div>
-        <div id="patternList"></div>
+        <button class="del-btn" onclick="deleteLast()">Correction : Effacer dernier tour</button>
     </div>
 </div>
 
 <script>
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
-    const targets = [1, 2, 5, 8];
+    let currentTab = 'live';
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function triggerVibration(pattern) { if ("vibrate" in navigator) navigator.vibrate(pattern); }
 
     function switchTab(tab) {
+        currentTab = tab;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('live-view').style.display = tab === 'live' ? 'block' : 'none';
-        document.getElementById('archive-view').style.display = tab === 'archive' ? 'block' : 'none';
         document.getElementById('btn-' + tab).classList.add('active');
+        updateUI();
     }
 
     function addNumber(val) {
+        triggerVibration(40);
         results.unshift(val);
         if(results.length > 5000) results.pop();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
@@ -128,53 +127,48 @@
 
     function deleteLast() {
         if(results.length === 0) return;
+        triggerVibration(80);
         results.shift();
         localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
-    function calculateStats(num) {
+    function getStats(num) {
         const last50 = results.slice(0, 50).filter(x => x === num).length;
         const last100 = results.slice(0, 100).filter(x => x === num).length;
         const currentDelay = results.indexOf(num);
         
-        let maxDelay = 0, temp = 0;
-        results.forEach(n => {
-            if (n === num) {
-                if (temp > maxDelay) maxDelay = temp;
-                temp = 0;
-            } else temp++;
-        });
-
-        return {
-            delay: currentDelay === -1 ? results.length : currentDelay,
-            f50: last50,
-            f100: last100,
-            max: maxDelay
-        };
+        let maxDelay = 0; let temp = 0;
+        for(let r of results) {
+            if(r === num) { if(temp > maxDelay) maxDelay = temp; temp = 0; } 
+            else { temp++; }
+        }
+        return { delay: currentDelay === -1 ? '?' : currentDelay, f50: last50, f100: last100, max: maxDelay };
     }
 
     function updateUI() {
-        // MAJ GRILLES
-        document.getElementById("grid-live").innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+        // MAJ GRILLE
+        const grid = document.getElementById("grid-content");
+        let html = "";
+        const data = currentTab === 'live' ? results.slice(0, 200) : results;
         
-        let arcHTML = "";
-        for (let i = 0; i < results.length; i++) {
-            if (i > 0 && i % 500 === 0) arcHTML += `<div style="grid-column:span 10; background:var(--gold); color:black; font-size:7px; text-align:center; margin:4px 0;">PALIER ${i}</div>`;
-            arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
-        }
-        document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
+        data.forEach((n, i) => {
+            if (currentTab === 'archive' && i > 0 && i % 500 === 0) html += `<div class="sep-500">ZONE ${i} TOURS</div>`;
+            html += `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`;
+        });
+        grid.innerHTML = html || "<div style='grid-column:span 10; text-align:center; font-size:10px; padding:20px;'>Aucun tour enregistré</div>";
 
-        // MAJ BOUTONS STATS
+        // MAJ STATS SUR BOUTONS
+        const targets = [1, 2, 5, 8];
         let statHTML = "";
-        targets.forEach(num => {
-            const s = calculateStats(num);
+        targets.forEach(t => {
+            const s = getStats(t);
             statHTML += `
-                <div class="st-btn">
-                    <span class="st-name">ST ${num}</span>
-                    <span class="st-main">R: ${s.delay}</span>
-                    <span class="st-sub">50t: ${s.f50} | 100t: ${s.f100}</span>
-                    <span class="st-sub" style="color:var(--gold)">MAX: ${s.max}</span>
+                <div class="st-btn" onclick="alert('Détails ${t}: Record Abs ${s.max}')">
+                    <span class="st-label">ST ${t}</span>
+                    <span class="st-now">R: ${s.delay}</span>
+                    <span class="st-val">50t: ${s.f50} | 100t: ${s.f100}</span>
+                    <span class="st-val">MAX: ${s.max}</span>
                 </div>`;
         });
         document.getElementById("stat-container").innerHTML = statHTML;
@@ -186,15 +180,16 @@
     function checkAlerts() {
         const az = document.getElementById("alert-zone");
         let alerts = [];
-        targets.forEach(n => {
+        [1,2,5,8].forEach(n => {
             const d = results.indexOf(n);
-            const limit = (n === 1) ? 10 : (n === 2) ? 20 : 40;
-            if(d > limit) alerts.push(n + " (" + d + "t)");
+            const limit = n === 1 ? 12 : n === 2 ? 22 : 45;
+            if(d > limit) alerts.push(`${n}(${d}t)`);
         });
 
         if(alerts.length > 0) {
             az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
             az.classList.add("active-alert");
+            triggerVibration([100, 50, 100]);
         } else {
             az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
             az.classList.remove("active-alert");
@@ -208,17 +203,14 @@
             let p = results.slice(i, i+5).join("-");
             patterns[p] = (patterns[p] || 0) + 1;
         }
-        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 8);
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 6);
         document.getElementById("patternList").innerHTML = sorted.map(p => {
             let seq = p[0].split('-').reverse().join('→');
             return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
         }).join('');
     }
 
-    window.onload = () => {
-        updateUI();
-        switchTab('live');
-    };
+    window.onload = updateUI;
 </script>
 </body>
 </html>
