@@ -118,4 +118,98 @@
     }
 
     function switchTab(tab) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+        document.getElementById('btn-' + tab).classList.add('active');
+        document.getElementById(tab + '-view').classList.add('active');
+    }
+
+    function updateUI() {
+        // LIVE GRID
+        const liveGrid = document.getElementById("grid-live");
+        liveGrid.innerHTML = results.slice(0, 250).map((n, i) => `<div class="res-item"><span class="res-idx">${i + 1}</span>${n}</div>`).join('');
+
+        // ARCHIVE GRID AVEC SÉPARATEURS
+        const arcGrid = document.getElementById("grid-archive");
+        let arcHTML = "";
+        for (let i = 0; i < results.length; i++) {
+            if (i > 0 && i % 1000 === 0) arcHTML += `<div class="sep-1000">🚨 PALIER ${i} TOURS 🚨</div>`;
+            else if (i > 0 && i % 500 === 0) arcHTML += `<div class="sep-500">📍 ZONE ${i} TOURS</div>`;
+            arcHTML += `<div class="res-item"><span class="res-idx">${i + 1}</span>${results[i]}</div>`;
+        }
+        arcGrid.innerHTML = arcHTML || "<div style='grid-column: span 10; text-align:center; padding:20px; color:#444;'>Aucune donnée</div>";
+        
+        checkAlerts();
+        updatePatterns();
+    }
+
+    function addNumber() {
+        const val = document.getElementById("numIn").value;
+        if(!val) return;
+        results.unshift(parseInt(val));
+        if(results.length > 5000) results.pop();
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
+        updateUI();
+        document.getElementById("numIn").value = "";
+    }
+
+    function deleteLast() {
+        if(results.length === 0) return;
+        if(confirm("Effacer le tour " + results[0] + " ?")) {
+            results.shift();
+            localStorage.setItem("mw_final_v7", JSON.stringify(results));
+            updateUI();
+        }
+    }
+
+    function checkAlerts() {
+        const az = document.getElementById("alert-zone");
+        let alerts = [];
+        const d1=results.indexOf(1), d2=results.indexOf(2), d5=results.indexOf(5), d8=results.indexOf(8);
+        
+        if(d1 > 10) alerts.push("1 ("+d1+"t)");
+        if(d2 > 20) alerts.push("2 ("+d2+"t)");
+        if(d5 > 40) alerts.push("5 ("+d5+"t)");
+        if(d8 > 40) alerts.push("8 ("+d8+"t)");
+
+        if(alerts.length > 0) {
+            az.innerHTML = "⚠️ ALERTE : " + alerts.join(" | ");
+            az.classList.add("active-alert");
+            beep(600, 150);
+        } else {
+            az.innerHTML = "SYSTÈME PRÊT • " + results.length + " TOURS";
+            az.classList.remove("active-alert");
+        }
+    }
+
+    function fullAnalysis(num) {
+        if(results.length === 0) return;
+        const currentDelay = results.indexOf(num);
+        let maxDelay = 0, tempDelay = 0, endIdx = 0;
+        for (let i = 0; i < results.length; i++) {
+            if (results[i] === num) {
+                if (tempDelay > maxDelay) { maxDelay = tempDelay; endIdx = i; }
+                tempDelay = 0;
+            } else tempDelay++;
+        }
+        alert("ANALYSE N°" + num + "\nRetard actuel: " + (currentDelay === -1 ? "N/A" : currentDelay) + "\nRecord d'absence: " + maxDelay + " tours");
+    }
+
+    function updatePatterns() {
+        if(results.length < 10) return;
+        let patterns = {};
+        for(let i=0; i <= results.length - 5; i++) {
+            let p = results.slice(i, i+5).join("-");
+            patterns[p] = (patterns[p] || 0) + 1;
+        }
+        let sorted = Object.entries(patterns).filter(p => p[1] > 1).sort((a,b) => b[1] - a[1]).slice(0, 12);
+        document.getElementById("patternList").innerHTML = sorted.map(p => {
+            let seq = p[0].split('-').reverse().join('→');
+            return `<div class="pattern-line"><span>${seq}</span> <b style="color:var(--gold)">${p[1]}x</b></div>`;
+        }).join('');
+    }
+
+    window.onload = updateUI;
+</script>
+</body>
+</html>
