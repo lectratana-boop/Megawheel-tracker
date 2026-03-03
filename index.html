@@ -3,82 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tracker IA v16.5 - Math Logic</title>
+    <title>Megawheel Predictor v18.0 - Balanced Logic</title>
     <style>
         :root {
-            --bg: #1a1a2e;
+            --bg: #0d0d1a;
             --card: #16213e;
             --accent: #00ffcc;
             --gold: #f1c40f;
             --white: #ffffff;
             --red: #ff4757;
-            --out-shadow: 4px 4px 8px #0d1220, -2px -2px 6px #23305c;
-            --in-shadow: inset 3px 3px 6px #0d1220, inset -1px -1px 4px #23305c;
+            --blue: #4d94ff;
+            --out-shadow: 4px 4px 8px #05050a, -2px -2px 6px #1b2645;
+            --in-shadow: inset 3px 3px 6px #05050a, inset -1px -1px 4px #1b2645;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 420px; background: var(--card); padding: 15px; border-radius: 20px; box-shadow: var(--out-shadow); display: flex; flex-direction: column; gap: 8px; }
         
         .app-header { text-align: center; border-bottom: 2px solid #23305c; padding-bottom: 5px; }
-        .app-title { font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .app-title { font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
         .app-title span { color: var(--accent); }
 
         #alert-zone { 
-            min-height: 45px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; 
+            min-height: 45px; background: rgba(0, 0, 0, 0.4); border-radius: 10px; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 12px; font-weight: 900; color: #444; border: 1px solid #222; text-align: center;
+            font-size: 11px; font-weight: 900; color: #555; border: 1px solid #1a1a1a; text-align: center;
         }
-        .active-alert { background: var(--red) !important; color: white !important; animation: alert-flash 0.5s infinite; }
-        @keyframes alert-flash { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .active-alert { border-color: var(--red) !important; color: white !important; background: rgba(255, 71, 87, 0.3) !important; animation: blink 0.8s infinite; }
+        @keyframes blink { 50% { opacity: 0.6; } }
 
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 5px 0; }
         .num-btn { 
             background: linear-gradient(145deg, #1e2a4a, #16213e);
             border: 1px solid #23305c; color: var(--white);
-            font-size: 1.3rem; font-weight: 900; padding: 16px 0;
-            border-radius: 12px; cursor: pointer; box-shadow: var(--out-shadow);
+            font-size: 1.4rem; font-weight: 900; padding: 18px 0;
+            border-radius: 15px; cursor: pointer; box-shadow: var(--out-shadow);
             -webkit-tap-highlight-color: transparent;
         }
-        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.96); color: var(--accent); }
+        .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
         
         .del-btn { 
-            grid-column: span 3; background: #2c3e50; color: #bdc3c7; border: none; 
-            border-radius: 12px; font-weight: bold; font-size: 11px; padding: 12px;
-            cursor: pointer; text-transform: uppercase;
+            grid-column: span 3; background: #1a1a2e; color: #999; border: 1px solid #333; 
+            border-radius: 10px; font-weight: bold; font-size: 11px; padding: 10px;
+            cursor: pointer; text-transform: uppercase; margin-top: 5px;
         }
 
-        .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .analyser-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); font-size: 10px; font-weight: bold; padding: 10px 0; border-radius: 8px; }
-
-        .tabs { display: flex; gap: 5px; }
+        .tabs { display: flex; gap: 5px; margin-top: 5px;}
         .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--bg); color: #555; font-size: 10px; font-weight: bold; }
         .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); }
 
-        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 10px; height: 160px; overflow-y: auto; border: 1px solid #222; }
+        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 10px; height: 140px; overflow-y: auto; border: 1px solid #222; }
         .view-content.active { display: block; }
         .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
-        .res-item { background: var(--card); font-size: 10px; padding: 7px 0; text-align: center; border-radius: 4px; color: var(--accent); font-weight: bold; position: relative; }
+        .res-item { background: var(--card); font-size: 10px; padding: 7px 0; text-align: center; border-radius: 4px; color: var(--accent); font-weight: bold; position: relative; border: 1px solid #1a1a1a; }
 
-        /* PREDICTOR STYLISE */
+        /* PREDICTOR BALANCED */
         .predictor-box { 
-            background: linear-gradient(180deg, #0a0a1a 0%, #16213e 100%); 
-            border-radius: 15px; padding: 15px; border: 1px solid var(--accent); 
-            margin-top: 5px; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+            background: linear-gradient(180deg, #05050a 0%, #0d0d1a 100%); 
+            border-radius: 15px; padding: 15px; border: 2px solid var(--blue); 
+            margin-top: 5px; box-shadow: 0 0 20px rgba(77, 148, 255, 0.2);
         }
-        .predictor-title { color: var(--accent); text-align: center; font-weight: 900; font-size: 12px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .predictor-results { display: flex; flex-direction: column; gap: 10px; }
-        .pred-line { display: flex; align-items: center; gap: 10px; }
-        .pred-label { width: 60px; font-weight: bold; font-size: 12px; color: var(--white); }
-        .pred-bar-container { flex-grow: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-        .pred-bar-fill { height: 100%; background: var(--accent); transition: width 0.5s ease-out; }
-        .pred-val { width: 45px; text-align: right; color: var(--gold); font-weight: bold; font-family: monospace; font-size: 14px; }
+        .predictor-title { color: var(--blue); text-align: center; font-weight: 900; font-size: 13px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; }
+        .predictor-results { display: flex; flex-direction: column; gap: 12px; }
+        .pred-line { display: flex; align-items: center; justify-content: space-between; }
+        .pred-num-tag { background: var(--blue); color: #fff; padding: 4px 10px; border-radius: 5px; font-weight: 900; font-size: 14px; min-width: 30px; text-align: center; }
+        .pred-bar-wrapper { flex-grow: 1; margin: 0 15px; height: 10px; background: #111; border-radius: 5px; overflow: hidden; border: 1px solid #222;}
+        .pred-bar-active { height: 100%; background: linear-gradient(90deg, var(--blue), var(--accent)); transition: width 0.6s ease-out; }
+        .pred-percent-tag { color: var(--accent); font-weight: 900; font-family: monospace; font-size: 16px; min-width: 50px; text-align: right; }
+        
+        .logic-label { font-size: 8px; color: #555; text-align: center; margin-top: 5px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Logic Predictor</span></h1>
+        <h1 class="app-title">Megawheel <span>Balanced IA</span></h1>
     </div>
 
     <div class="numpad">
@@ -91,31 +91,25 @@
         <button class="num-btn" onclick="quickAdd(20)">20</button>
         <button class="num-btn" onclick="quickAdd(30)">30</button>
         <button class="num-btn" onclick="quickAdd(40)">40</button>
-        <button class="del-btn" onclick="deleteLast()">EFFACER DERNIÈRE ENTRÉE</button>
+        <button class="del-btn" onclick="deleteLast()">Correction dernier tour</button>
     </div>
 
-    <div id="alert-zone">INITIALISATION MATHÉMATIQUE...</div>
-
-    <div class="stat-grid-4">
-        <button class="analyser-btn" onclick="fullAnalysis(1)">ST 1</button>
-        <button class="analyser-btn" onclick="fullAnalysis(2)">ST 2</button>
-        <button class="analyser-btn" onclick="fullAnalysis(5)">ST 5</button>
-        <button class="analyser-btn" onclick="fullAnalysis(8)">ST 8</button>
-    </div>
+    <div id="alert-zone">SYSTÈME PRÊT</div>
 
     <div class="tabs">
         <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
-        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTO</button>
+        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORY</button>
     </div>
 
     <div id="live-view" class="view-content active"><div id="grid-live" class="res-grid"></div></div>
     <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="predictor-box">
-        <div class="predictor-title">LOGICAL PREDICTOR (%)</div>
+        <div class="predictor-title">PREDICTOR : BALANCED SCORE</div>
         <div id="predictorDisplay" class="predictor-results">
-            <div style="text-align:center; color:#444; font-size:10px;">En attente d'analyse...</div>
+            <div style="text-align:center; color:#333; font-size:10px;">Calcul de convergence...</div>
         </div>
+        <div class="logic-label">Analyse : Retard Critiques + Momentum 50 Tours</div>
     </div>
 </div>
 
@@ -154,89 +148,87 @@
     }
 
     function updateUI() {
-        document.getElementById("grid-live").innerHTML = results.slice(0, 200).map((n, i) => 
-            `<div class="res-item"><span style="position:absolute;top:0;left:1px;font-size:5px;color:#555;">${i + 1}</span>${n}</div>`
+        document.getElementById("grid-live").innerHTML = results.slice(0, 100).map((n, i) => 
+            `<div class="res-item"><span style="position:absolute;top:0;left:1px;font-size:5px;color:#444;">${i + 1}</span>${n}</div>`
         ).join('');
         
         let arcHTML = "";
         for (let i = 0; i < results.length; i++) {
-            if (i > 0 && i % 500 === 0) arcHTML += `<div style="grid-column: span 10; background:var(--gold); color:black; font-size:9px; font-weight:bold; text-align:center; padding:3px; margin:5px 0;">ZONE ${i}</div>`;
             arcHTML += `<div class="res-item">${results[i]}</div>`;
         }
         document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
         
         checkAlerts();
-        calculateLogicalPredictor();
+        calculateBalancedPredictor();
     }
 
     function checkAlerts() {
         const az = document.getElementById("alert-zone");
         let alerts = [];
-        const thresholds = {1:10, 2:20, 5:40, 8:40};
         [1, 2, 5, 8].forEach(n => {
             let delay = results.indexOf(n);
-            if(delay >= thresholds[n]) alerts.push(`${n} (${delay}t)`);
+            let limit = (n === 1) ? 10 : (n === 2 ? 20 : 40);
+            if(delay >= limit) alerts.push(`${n} (${delay}t)`);
         });
 
         if(alerts.length > 0) {
-            az.innerHTML = "🚨 ALERTE RETARD : " + alerts.join(" | ");
+            az.innerHTML = "🚨 RETARD CRITIQUE : " + alerts.join(" | ");
             az.classList.add("active-alert");
-            beep(550, 200);
+            beep(580, 200);
         } else {
-            az.innerHTML = "LOGIQUE RNG ANALYSÉE • " + results.length + " TOURS";
+            az.innerHTML = "ANALYSE LOGIQUE EN COURS (" + results.length + "t)";
             az.classList.remove("active-alert");
         }
     }
 
-    function calculateLogicalPredictor() {
+    function calculateBalancedPredictor() {
         if (results.length < 10) return;
 
-        // Étape 1 : Calcul des fréquences réelles
-        let counts = {};
-        results.forEach(val => counts[val] = (counts[val] || 0) + 1);
-
-        // Étape 2 : Pondération logique (Fréquence + Écart récent)
-        // On donne plus de poids aux numéros qui apparaissent souvent ET à ceux qui ont un retard anormal
-        let logicScores = [];
         const allNums = [1, 2, 5, 8, 10, 15, 20, 30, 40];
+        const recent50 = results.slice(0, 50);
+        let balancedScores = [];
 
         allNums.forEach(num => {
-            let freq = (counts[num] || 0) / results.length;
+            // 1. FACTEUR TENDANCE (Momentum récent)
+            let freqRecent = recent50.filter(x => x === num).length / recent50.length;
+            
+            // 2. FACTEUR RETARD (Convergence mathématique)
             let delay = results.indexOf(num);
             if(delay === -1) delay = 100;
             
-            // Score logique = (Fréquence brute * 100) + (Bonus de retard pour inciter le retour à la moyenne)
-            let score = (freq * 100) + (delay * 0.5);
-            logicScores.push({ num, score });
+            // On normalise le retard par rapport à l'importance du numéro
+            // Le retard d'un 1 compte plus vite que le retard d'un 40
+            let delayWeight = (num === 1) ? delay / 10 : (num === 2 ? delay / 20 : delay / 40);
+
+            // LOGIQUE DE LA BALANCE :
+            // Score = (Poids de la tendance * 60%) + (Poids du retard * 40%)
+            let trendScore = freqRecent * 100;
+            let retardScore = delayWeight * 15; // Bonus progressif si retard important
+            
+            let finalScore = trendScore + retardScore;
+            balancedScores.push({ num, score: finalScore });
         });
 
-        // Étape 3 : Sélection du Top 3
-        let top3 = logicScores.sort((a, b) => b.score - a.score).slice(0, 3);
+        let top3 = balancedScores.sort((a, b) => b.score - a.score).slice(0, 3);
         let totalScore = top3.reduce((a, b) => a + b.score, 0);
 
-        // Étape 4 : Affichage avec calcul 100% strict
+        // Calcul % strict total 100%
         let p1 = Math.round((top3[0].score / totalScore) * 100);
         let p2 = Math.round((top3[1].score / totalScore) * 100);
         let p3 = 100 - (p1 + p2);
 
         let html = top3.map((item, i) => {
-            let p = i === 0 ? p1 : (i === 1 ? p2 : p3);
+            let p = (i === 0) ? p1 : (i === 1 ? p2 : p3);
             return `
                 <div class="pred-line">
-                    <span class="pred-label">Num ${item.num}</span>
-                    <div class="pred-bar-container"><div class="pred-bar-fill" style="width: ${p}%"></div></div>
-                    <span class="pred-val">${p}%</span>
+                    <div class="pred-num-tag">${item.num}</div>
+                    <div class="pred-bar-wrapper"><div class="pred-bar-active" style="width: ${p}%"></div></div>
+                    <div class="pred-percent-tag">${p}%</div>
                 </div>
             `;
         }).join('');
         
         document.getElementById("predictorDisplay").innerHTML = html;
-    }
-
-    function fullAnalysis(num) {
-        if(results.length === 0) return;
-        const delay = results.indexOf(num);
-        alert(`Analyse Numéro ${num}\nRetard : ${delay === -1 ? 'Jamais' : delay} tours\nLogique : Surveiller si retard > ${num === 1 ? 10 : 30}`);
     }
 
     window.onload = updateUI;
