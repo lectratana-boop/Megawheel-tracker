@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Predictor v18.0 - Profit Analyzer</title>
+    <title>Megawheel Predictor v18.0 - Balanced Logic</title>
     <style>
         :root {
             --bg: #0d0d1a;
@@ -38,7 +38,7 @@
             border: 1px solid #23305c; color: var(--white);
             font-size: 1.4rem; font-weight: 900; padding: 18px 0;
             border-radius: 15px; cursor: pointer; box-shadow: var(--out-shadow);
-            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         .num-btn:active { box-shadow: var(--in-shadow); transform: scale(0.95); color: var(--accent); }
         
@@ -48,33 +48,37 @@
             cursor: pointer; text-transform: uppercase; margin-top: 5px;
         }
 
+        .tabs { display: flex; gap: 5px; margin-top: 5px;}
+        .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--bg); color: #555; font-size: 10px; font-weight: bold; }
+        .tab-btn.active { color: var(--accent); border: 1px solid var(--accent); }
+
+        .view-content { display: none; background: var(--bg); border-radius: 12px; padding: 10px; height: 140px; overflow-y: auto; border: 1px solid #222; }
+        .view-content.active { display: block; }
+        .res-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        .res-item { background: var(--card); font-size: 10px; padding: 7px 0; text-align: center; border-radius: 4px; color: var(--accent); font-weight: bold; position: relative; border: 1px solid #1a1a1a; }
+
+        /* PREDICTOR BALANCED */
         .predictor-box { 
             background: linear-gradient(180deg, #05050a 0%, #0d0d1a 100%); 
             border-radius: 15px; padding: 15px; border: 2px solid var(--blue); 
             margin-top: 5px; box-shadow: 0 0 20px rgba(77, 148, 255, 0.2);
         }
-        .predictor-title { color: var(--blue); text-align: center; font-weight: 900; font-size: 13px; margin-bottom: 12px; text-transform: uppercase; }
-        .pred-line { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .predictor-title { color: var(--blue); text-align: center; font-weight: 900; font-size: 13px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; }
+        .predictor-results { display: flex; flex-direction: column; gap: 12px; }
+        .pred-line { display: flex; align-items: center; justify-content: space-between; }
         .pred-num-tag { background: var(--blue); color: #fff; padding: 4px 10px; border-radius: 5px; font-weight: 900; font-size: 14px; min-width: 30px; text-align: center; }
         .pred-bar-wrapper { flex-grow: 1; margin: 0 15px; height: 10px; background: #111; border-radius: 5px; overflow: hidden; border: 1px solid #222;}
-        .pred-bar-active { height: 100%; background: linear-gradient(90deg, var(--blue), var(--accent)); transition: width 0.4s ease-out; }
+        .pred-bar-active { height: 100%; background: linear-gradient(90deg, var(--blue), var(--accent)); transition: width 0.6s ease-out; }
         .pred-percent-tag { color: var(--accent); font-weight: 900; font-family: monospace; font-size: 16px; min-width: 50px; text-align: right; }
-
-        .stats-box { background: #000; border: 1px solid var(--gold); border-radius: 12px; padding: 12px; margin-top: 5px; }
-        .stats-title { color: var(--gold); font-weight: bold; text-align: center; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; }
-        .win { color: var(--accent); font-weight: bold; }
-        .loss { color: var(--red); font-weight: bold; }
-
-        .history-mini { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; background: #000; padding: 8px; border-radius: 10px; height: 80px; overflow-y: auto; border: 1px solid #222; }
-        .res-item { background: #111; font-size: 10px; padding: 5px 0; text-align: center; border-radius: 4px; color: var(--accent); font-weight: bold; border: 1px solid #222; }
+        
+        .logic-label { font-size: 8px; color: #555; text-align: center; margin-top: 5px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Logic & Profit</span></h1>
+        <h1 class="app-title">Megawheel <span>Balanced IA</span></h1>
     </div>
 
     <div class="numpad">
@@ -90,24 +94,44 @@
         <button class="del-btn" onclick="deleteLast()">Correction dernier tour</button>
     </div>
 
-    <div id="alert-zone">ANALYSE EN COURS...</div>
+    <div id="alert-zone">SYSTÈME PRÊT</div>
+
+    <div class="tabs">
+        <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
+        <button id="btn-archive" class="tab-btn" onclick="switchTab('archive')">HISTORY</button>
+    </div>
+
+    <div id="live-view" class="view-content active"><div id="grid-live" class="res-grid"></div></div>
+    <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="predictor-box">
-        <div class="predictor-title">PREDICTOR BALANCED</div>
-        <div id="predictorDisplay"></div>
+        <div class="predictor-title">PREDICTOR : BALANCED SCORE</div>
+        <div id="predictorDisplay" class="predictor-results">
+            <div style="text-align:center; color:#333; font-size:10px;">Calcul de convergence...</div>
+        </div>
+        <div class="logic-label">Analyse : Retard Critiques + Momentum 50 Tours</div>
     </div>
-
-    <div class="stats-box">
-        <div class="stats-title">Performance Stratégie (Num 2)</div>
-        <div id="backtest-results"></div>
-    </div>
-
-    <div class="history-mini" id="grid-live"></div>
 </div>
 
 <script>
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
-    const grilleMise = { 1:500, 2:500, 3:500, 4:1000, 5:1000, 6:1000, 7:2000, 8:2000, 9:3500, 10:4500, 11:5000, 12:8500 };
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function beep(freq, dur) {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq; osc.start();
+        setTimeout(() => osc.stop(), dur);
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+        document.getElementById('btn-' + tab).classList.add('active');
+        document.getElementById(tab + '-view').classList.add('active');
+    }
 
     function quickAdd(val) {
         results.unshift(val);
@@ -124,80 +148,87 @@
     }
 
     function updateUI() {
-        document.getElementById("grid-live").innerHTML = results.slice(0, 50).map(n => `<div class="res-item">${n}</div>`).join('');
+        document.getElementById("grid-live").innerHTML = results.slice(0, 100).map((n, i) => 
+            `<div class="res-item"><span style="position:absolute;top:0;left:1px;font-size:5px;color:#444;">${i + 1}</span>${n}</div>`
+        ).join('');
+        
+        let arcHTML = "";
+        for (let i = 0; i < results.length; i++) {
+            arcHTML += `<div class="res-item">${results[i]}</div>`;
+        }
+        document.getElementById("grid-archive").innerHTML = arcHTML || "Vide";
+        
         checkAlerts();
         calculateBalancedPredictor();
-        runBacktest();
     }
 
     function checkAlerts() {
         const az = document.getElementById("alert-zone");
-        let d1 = results.indexOf(1);
-        if(d1 >= 10) {
-            az.innerHTML = "🚨 RETARD CRITIQUE : 1 (" + d1 + "t)";
+        let alerts = [];
+        [1, 2, 5, 8].forEach(n => {
+            let delay = results.indexOf(n);
+            let limit = (n === 1) ? 10 : (n === 2 ? 20 : 40);
+            if(delay >= limit) alerts.push(`${n} (${delay}t)`);
+        });
+
+        if(alerts.length > 0) {
+            az.innerHTML = "🚨 RETARD CRITIQUE : " + alerts.join(" | ");
             az.classList.add("active-alert");
+            beep(580, 200);
         } else {
-            az.innerHTML = "LOGIQUE ACTIVE • " + results.length + " TOURS";
+            az.innerHTML = "ANALYSE LOGIQUE EN COURS (" + results.length + "t)";
             az.classList.remove("active-alert");
         }
     }
 
     function calculateBalancedPredictor() {
-        if (results.length < 5) return;
+        if (results.length < 10) return;
+
         const allNums = [1, 2, 5, 8, 10, 15, 20, 30, 40];
         const recent50 = results.slice(0, 50);
-        let scores = [];
+        let balancedScores = [];
 
         allNums.forEach(num => {
+            // 1. FACTEUR TENDANCE (Momentum récent)
             let freqRecent = recent50.filter(x => x === num).length / recent50.length;
+            
+            // 2. FACTEUR RETARD (Convergence mathématique)
             let delay = results.indexOf(num);
             if(delay === -1) delay = 100;
-            let delayWeight = (num === 1) ? delay/10 : (num === 2 ? delay/20 : delay/40);
-            let finalScore = (freqRecent * 100) + (delayWeight * 15);
-            scores.push({ num, score: finalScore });
+            
+            // On normalise le retard par rapport à l'importance du numéro
+            // Le retard d'un 1 compte plus vite que le retard d'un 40
+            let delayWeight = (num === 1) ? delay / 10 : (num === 2 ? delay / 20 : delay / 40);
+
+            // LOGIQUE DE LA BALANCE :
+            // Score = (Poids de la tendance * 60%) + (Poids du retard * 40%)
+            let trendScore = freqRecent * 100;
+            let retardScore = delayWeight * 15; // Bonus progressif si retard important
+            
+            let finalScore = trendScore + retardScore;
+            balancedScores.push({ num, score: finalScore });
         });
 
-        let top3 = scores.sort((a, b) => b.score - a.score).slice(0, 3);
-        let total = top3.reduce((a, b) => a + b.score, 0);
-        let p1 = Math.round((top3[0].score / total) * 100);
-        let p2 = Math.round((top3[1].score / total) * 100);
+        let top3 = balancedScores.sort((a, b) => b.score - a.score).slice(0, 3);
+        let totalScore = top3.reduce((a, b) => a + b.score, 0);
+
+        // Calcul % strict total 100%
+        let p1 = Math.round((top3[0].score / totalScore) * 100);
+        let p2 = Math.round((top3[1].score / totalScore) * 100);
         let p3 = 100 - (p1 + p2);
 
-        document.getElementById("predictorDisplay").innerHTML = top3.map((item, i) => {
+        let html = top3.map((item, i) => {
             let p = (i === 0) ? p1 : (i === 1 ? p2 : p3);
-            return `<div class="pred-line"><div class="pred-num-tag">${item.num}</div><div class="pred-bar-wrapper"><div class="pred-bar-active" style="width:${p}%"></div></div><div class="pred-percent-tag">${p}%</div></div>`;
+            return `
+                <div class="pred-line">
+                    <div class="pred-num-tag">${item.num}</div>
+                    <div class="pred-bar-wrapper"><div class="pred-bar-active" style="width: ${p}%"></div></div>
+                    <div class="pred-percent-tag">${p}%</div>
+                </div>
+            `;
         }).join('');
-    }
-
-    function runBacktest() {
-        if (results.length < 13) return;
-        let totalProfitNet = 0, nbrWins = 0, nbrLosses = 0, tourActuelMise = 1, pertesSession = 0;
-        let history = [...results].reverse();
-
-        for (let i = 0; i < history.length; i++) {
-            let miseDuTour = grilleMise[tourActuelMise];
-            if (history[i] === 2) {
-                totalProfitNet += (miseDuTour * 3) - (pertesSession + miseDuTour);
-                nbrWins++;
-                tourActuelMise = 1; pertesSession = 0;
-            } else {
-                pertesSession += miseDuTour;
-                tourActuelMise++;
-                if (tourActuelMise > 12) {
-                    totalProfitNet -= pertesSession;
-                    nbrLosses++;
-                    tourActuelMise = 1; pertesSession = 0;
-                }
-            }
-        }
-
-        document.getElementById("backtest-results").innerHTML = `
-            <div class="stat-row"><span>Succès (< 12 tours) :</span> <span class="win">${nbrWins}</span></div>
-            <div class="stat-row"><span>Échecs (Perte 30k) :</span> <span class="loss">${nbrLosses}</span></div>
-            <div class="stat-row" style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">
-                <span>PROFIT NET TOTAL :</span> <span style="color:${totalProfitNet >= 0 ? 'var(--accent)' : 'var(--red)'}; font-size:14px;">${totalProfitNet.toLocaleString()} Ar</span>
-            </div>
-        `;
+        
+        document.getElementById("predictorDisplay").innerHTML = html;
     }
 
     window.onload = updateUI;
