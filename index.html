@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tactical v19.5 - Full Control</title>
+    <title>Megawheel Tactical v19.7 - Ultimate Edition</title>
     <style>
         :root {
             --bg: #0d0d1a; --card: #16213e; --accent: #00ffcc;
@@ -23,7 +23,6 @@
             font-size: 11px; font-weight: 900; color: #555; border: 1px solid #1a1a1a; text-align: center;
         }
         .active-alert { border-color: var(--red) !important; color: white !important; background: rgba(255, 71, 87, 0.3) !important; animation: blink 0.8s infinite; }
-        @keyframes blink { 50% { opacity: 0.6; } }
 
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .num-btn { 
@@ -50,8 +49,8 @@
             text-align: center; margin-top: 5px;
         }
         .pred-title { color: var(--gold); font-weight: 900; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; }
-        .current-bet { background: rgba(241, 196, 15, 0.1); width: 100%; padding: 10px; border-radius: 10px; border: 1px dashed var(--gold); box-sizing: border-box;}
-        .next-bet { background: rgba(0, 255, 204, 0.05); width: 100%; padding: 8px; border-radius: 10px; margin-top: 5px; color: #888; font-size: 13px; box-sizing: border-box;}
+        .current-bet { background: rgba(241, 196, 15, 0.1); padding: 10px; border-radius: 10px; border: 1px dashed var(--gold); margin-bottom: 8px; }
+        .next-bet { background: rgba(0, 255, 204, 0.05); padding: 8px; border-radius: 10px; color: #888; font-size: 13px; }
         .step-label { font-size: 10px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
         .val-big { font-size: 28px; font-weight: 900; color: var(--gold); }
         .val-small { font-size: 18px; font-weight: bold; color: var(--accent); }
@@ -61,7 +60,7 @@
 
 <div class="container">
     <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Tactical v19.5</span></h1>
+        <h1 class="app-title">Megawheel <span>Tactical v19.7</span></h1>
     </div>
 
     <div class="numpad">
@@ -81,7 +80,7 @@
         <button class="reset-btn" onclick="resetSession()">RESET SESSION</button>
     </div>
 
-    <div id="alert-zone">SYSTÈME ACTIF</div>
+    <div id="alert-zone">SYSTÈME PRÊT</div>
 
     <div class="tabs">
         <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
@@ -92,16 +91,17 @@
     <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="predictor-box">
-        <div class="pred-title">Assistant de Mise (Cible : 5)</div>
-        <div id="tacticalDisplay" class="tactical-main">
-            </div>
+        <div class="pred-title">GUIDE DE MISE (CIBLE : 5)</div>
+        <div id="tacticalDisplay"></div>
     </div>
 </div>
 
 <script>
-    let results = JSON.parse(localStorage.getItem("mw_final_v19")) || [];
+    // Connexion permanente à votre historique v7
+    let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
     let currentStep = 0; 
 
+    // Votre tableau de mise étendu
     const grilleMise = {
         1:500, 2:500, 3:500, 4:500, 5:500,
         6:1000, 7:1000, 8:1000, 9:1000, 10:1000,
@@ -122,12 +122,17 @@
         let lastDelay = results.indexOf(5);
         if (lastDelay === -1) lastDelay = 99;
 
-        if (val === 5) { currentStep = 0; } 
-        else if (currentStep === 0 && lastDelay >= 19) { currentStep = 1; } 
-        else if (currentStep > 0) { currentStep++; }
+        if (val === 5) { 
+            currentStep = 0; 
+        } else if (currentStep === 0 && lastDelay >= 19) { 
+            currentStep = 1; 
+        } else if (currentStep > 0) { 
+            currentStep++; 
+        }
 
         results.unshift(val);
-        localStorage.setItem("mw_final_v19", JSON.stringify(results));
+        if(results.length > 5000) results.pop();
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
@@ -135,14 +140,15 @@
         if(results.length === 0) return;
         results.shift();
         if (currentStep > 0) currentStep--;
+        localStorage.setItem("mw_final_v7", JSON.stringify(results));
         updateUI();
     }
 
     function resetSession() {
-        if (confirm("Voulez-vous vraiment effacer l'historique et recommencer à zéro ?")) {
+        if (confirm("Voulez-vous effacer vos données et recommencer ?")) {
             results = [];
             currentStep = 0;
-            localStorage.setItem("mw_final_v19", JSON.stringify(results));
+            localStorage.setItem("mw_final_v7", JSON.stringify(results));
             updateUI();
         }
     }
@@ -158,37 +164,33 @@
 
         if (currentStep === 0) {
             if (delay5 >= 20) {
-                az.innerHTML = "🚨 CIBLE DÉTECTÉE : MISER SUR LE 5";
+                az.innerHTML = "🚨 SIGNAL CRITIQUE : MISEZ SUR LE 5";
                 az.classList.add("active-alert");
                 display.innerHTML = `
                     <div class="current-bet">
                         <div class="step-label">Mise Actuelle (Tour 1)</div>
                         <div class="val-big">500 Ar</div>
                     </div>
-                    <div class="next-bet">Suivant (T2) : 500 Ar</div>
-                `;
+                    <div class="next-bet">Suivant (T2) : 500 Ar</div>`;
             } else {
-                az.innerHTML = "ANALYSE • ATTENTE : " + delay5 + "/20 TOURS";
+                az.innerHTML = "ANALYSE (" + results.length + " t) • ATTENTE : " + delay5 + "/20";
                 az.classList.remove("active-alert");
                 display.innerHTML = `<div style="color:#444; font-size:18px; font-weight:bold; padding:20px;">OBSERVATION...</div>`;
             }
         } else {
             az.innerHTML = "⚠️ RECOVERY EN COURS - TOUR " + currentStep;
             az.classList.add("active-alert");
-            
             let currentMise = grilleMise[currentStep] || "STOP";
             let nextMise = grilleMise[currentStep + 1] || "LIMITE";
-
             display.innerHTML = `
-                <div class="current-bet" style="display:block; width:100%;">
+                <div class="current-bet">
                     <div class="step-label">Mise Actuelle (Tour ${currentStep})</div>
                     <div class="val-big">${currentMise.toLocaleString()} Ar</div>
                 </div>
-                <div class="next-bet" style="display:block; width:100%;">
-                    <div class="step-label">Suivant (Tour ${currentStep + 1})</div>
+                <div class="next-bet">
+                    <div class="step-label">Préparation Suivante (Tour ${currentStep + 1})</div>
                     <div class="val-small">${nextMise.toLocaleString()} Ar</div>
-                </div>
-            `;
+                </div>`;
         }
     }
     window.onload = updateUI;
