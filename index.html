@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tactical v19.7 - Ultimate Edition</title>
+    <title>Megawheel Tactical v19.8 - Profit Tracker</title>
     <style>
         :root {
             --bg: #0d0d1a; --card: #16213e; --accent: #00ffcc;
@@ -48,7 +48,9 @@
             background: #05050a; border-radius: 15px; padding: 15px; border: 2px solid var(--gold); 
             text-align: center; margin-top: 5px;
         }
-        .pred-title { color: var(--gold); font-weight: 900; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; }
+        .profit-header { font-size: 11px; color: var(--accent); margin-bottom: 5px; font-weight: bold; }
+        .profit-val { font-size: 18px; color: #fff; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 5px;}
+        
         .current-bet { background: rgba(241, 196, 15, 0.1); padding: 10px; border-radius: 10px; border: 1px dashed var(--gold); margin-bottom: 8px; }
         .next-bet { background: rgba(0, 255, 204, 0.05); padding: 8px; border-radius: 10px; color: #888; font-size: 13px; }
         .step-label { font-size: 10px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
@@ -60,7 +62,7 @@
 
 <div class="container">
     <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Tactical v19.7</span></h1>
+        <h1 class="app-title">Megawheel <span>Profit v19.8</span></h1>
     </div>
 
     <div class="numpad">
@@ -91,17 +93,17 @@
     <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="predictor-box">
-        <div class="pred-title">GUIDE DE MISE (CIBLE : 5)</div>
+        <div class="profit-header">SESSION PROFIT ESTIMÉ</div>
+        <div id="profitDisplay" class="profit-val">0 Ar</div>
         <div id="tacticalDisplay"></div>
     </div>
 </div>
 
 <script>
-    // Connexion permanente à votre historique v7
     let results = JSON.parse(localStorage.getItem("mw_final_v7")) || [];
+    let sessionProfit = parseInt(localStorage.getItem("mw_profit")) || 0;
     let currentStep = 0; 
 
-    // Votre tableau de mise étendu
     const grilleMise = {
         1:500, 2:500, 3:500, 4:500, 5:500,
         6:1000, 7:1000, 8:1000, 9:1000, 10:1000,
@@ -123,6 +125,14 @@
         if (lastDelay === -1) lastDelay = 99;
 
         if (val === 5) { 
+            if (currentStep > 0) {
+                // Calcul du gain net : (Mise Actuelle * 5) - Somme des mises du cycle
+                let miseGagnante = grilleMise[currentStep];
+                let perteCycle = 0;
+                for (let i = 1; i <= currentStep; i++) { perteCycle += grilleMise[i]; }
+                sessionProfit += (miseGagnante * 5) - perteCycle;
+                localStorage.setItem("mw_profit", sessionProfit);
+            }
             currentStep = 0; 
         } else if (currentStep === 0 && lastDelay >= 19) { 
             currentStep = 1; 
@@ -145,10 +155,12 @@
     }
 
     function resetSession() {
-        if (confirm("Voulez-vous effacer vos données et recommencer ?")) {
+        if (confirm("Voulez-vous effacer les données et le profit ?")) {
             results = [];
             currentStep = 0;
+            sessionProfit = 0;
             localStorage.setItem("mw_final_v7", JSON.stringify(results));
+            localStorage.setItem("mw_profit", 0);
             updateUI();
         }
     }
@@ -156,6 +168,7 @@
     function updateUI() {
         document.getElementById("grid-live").innerHTML = results.slice(0, 100).map(n => `<div class="res-item">${n}</div>`).join('');
         document.getElementById("grid-archive").innerHTML = results.map(n => `<div class="res-item">${n}</div>`).join('');
+        document.getElementById("profitDisplay").innerHTML = sessionProfit.toLocaleString() + " Ar";
         
         const az = document.getElementById("alert-zone");
         const display = document.getElementById("tacticalDisplay");
