@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tactical v19.8 - Profit Tracker</title>
+    <title>Megawheel Tactical v19.9 - Real Multiplier x6</title>
     <style>
         :root {
             --bg: #0d0d1a; --card: #16213e; --accent: #00ffcc;
@@ -49,7 +49,7 @@
             text-align: center; margin-top: 5px;
         }
         .profit-header { font-size: 11px; color: var(--accent); margin-bottom: 5px; font-weight: bold; }
-        .profit-val { font-size: 18px; color: #fff; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 5px;}
+        .profit-val { font-size: 22px; color: #fff; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 5px; font-weight: 900;}
         
         .current-bet { background: rgba(241, 196, 15, 0.1); padding: 10px; border-radius: 10px; border: 1px dashed var(--gold); margin-bottom: 8px; }
         .next-bet { background: rgba(0, 255, 204, 0.05); padding: 8px; border-radius: 10px; color: #888; font-size: 13px; }
@@ -62,7 +62,7 @@
 
 <div class="container">
     <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Profit v19.8</span></h1>
+        <h1 class="app-title">Megawheel <span>Tactical v19.9</span></h1>
     </div>
 
     <div class="numpad">
@@ -93,7 +93,7 @@
     <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="predictor-box">
-        <div class="profit-header">SESSION PROFIT ESTIMÉ</div>
+        <div class="profit-header">SESSION PROFIT (x6)</div>
         <div id="profitDisplay" class="profit-val">0 Ar</div>
         <div id="tacticalDisplay"></div>
     </div>
@@ -126,11 +126,11 @@
 
         if (val === 5) { 
             if (currentStep > 0) {
-                // Calcul du gain net : (Mise Actuelle * 5) - Somme des mises du cycle
+                // MISE À JOUR : MULTIPLICATEUR x6
                 let miseGagnante = grilleMise[currentStep];
                 let perteCycle = 0;
                 for (let i = 1; i <= currentStep; i++) { perteCycle += grilleMise[i]; }
-                sessionProfit += (miseGagnante * 5) - perteCycle;
+                sessionProfit += (miseGagnante * 6) - perteCycle;
                 localStorage.setItem("mw_profit", sessionProfit);
             }
             currentStep = 0; 
@@ -155,7 +155,7 @@
     }
 
     function resetSession() {
-        if (confirm("Voulez-vous effacer les données et le profit ?")) {
+        if (confirm("Voulez-vous effacer vos données et le profit ?")) {
             results = [];
             currentStep = 0;
             sessionProfit = 0;
