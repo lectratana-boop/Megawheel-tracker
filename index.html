@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Megawheel Tactical v19.4 - Step-by-Step</title>
+    <title>Megawheel Tactical v19.5 - Full Control</title>
     <style>
         :root {
             --bg: #0d0d1a; --card: #16213e; --accent: #00ffcc;
@@ -31,7 +31,10 @@
             font-size: 1.4rem; font-weight: 900; padding: 15px 0; border-radius: 12px; cursor: pointer;
         }
         .num-btn:active { background: var(--accent); color: #000; }
-        .del-btn { grid-column: span 3; background: #1a1a2e; color: #999; border: 1px solid #333; padding: 8px; border-radius: 8px; font-size: 11px; cursor: pointer; }
+        
+        .utility-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .del-btn { background: #1a1a2e; color: #999; border: 1px solid #333; padding: 10px; border-radius: 10px; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .reset-btn { background: rgba(255, 71, 87, 0.1); color: var(--red); border: 1px solid var(--red); padding: 10px; border-radius: 10px; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
         .tabs { display: flex; gap: 5px; margin-top: 5px;}
         .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--bg); color: #555; font-size: 10px; font-weight: bold; }
@@ -47,9 +50,8 @@
             text-align: center; margin-top: 5px;
         }
         .pred-title { color: var(--gold); font-weight: 900; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; }
-        .tactical-main { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .current-bet { background: rgba(241, 196, 15, 0.1); width: 100%; padding: 10px; border-radius: 10px; border: 1px dashed var(--gold); }
-        .next-bet { background: rgba(0, 255, 204, 0.05); width: 100%; padding: 8px; border-radius: 10px; margin-top: 5px; color: #888; font-size: 13px; }
+        .current-bet { background: rgba(241, 196, 15, 0.1); width: 100%; padding: 10px; border-radius: 10px; border: 1px dashed var(--gold); box-sizing: border-box;}
+        .next-bet { background: rgba(0, 255, 204, 0.05); width: 100%; padding: 8px; border-radius: 10px; margin-top: 5px; color: #888; font-size: 13px; box-sizing: border-box;}
         .step-label { font-size: 10px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
         .val-big { font-size: 28px; font-weight: 900; color: var(--gold); }
         .val-small { font-size: 18px; font-weight: bold; color: var(--accent); }
@@ -59,7 +61,7 @@
 
 <div class="container">
     <div class="app-header">
-        <h1 class="app-title">Megawheel <span>Tactical v19.4</span></h1>
+        <h1 class="app-title">Megawheel <span>Tactical v19.5</span></h1>
     </div>
 
     <div class="numpad">
@@ -72,10 +74,14 @@
         <button class="num-btn" onclick="quickAdd(20)">20</button>
         <button class="num-btn" onclick="quickAdd(30)">30</button>
         <button class="num-btn" onclick="quickAdd(40)">40</button>
-        <button class="del-btn" onclick="deleteLast()">CORRECTION DERNIER TOUR</button>
     </div>
 
-    <div id="alert-zone">INITIALISATION...</div>
+    <div class="utility-btns">
+        <button class="del-btn" onclick="deleteLast()">CORRECTION</button>
+        <button class="reset-btn" onclick="resetSession()">RESET SESSION</button>
+    </div>
+
+    <div id="alert-zone">SYSTÈME ACTIF</div>
 
     <div class="tabs">
         <button id="btn-live" class="tab-btn active" onclick="switchTab('live')">LIVE</button>
@@ -86,7 +92,7 @@
     <div id="archive-view" class="view-content"><div id="grid-archive" class="res-grid"></div></div>
 
     <div class="predictor-box">
-        <div class="pred-title">GUIDE DE MISE EN DIRECT (Numéro 5)</div>
+        <div class="pred-title">Assistant de Mise (Cible : 5)</div>
         <div id="tacticalDisplay" class="tactical-main">
             </div>
     </div>
@@ -126,9 +132,19 @@
     }
 
     function deleteLast() {
+        if(results.length === 0) return;
         results.shift();
         if (currentStep > 0) currentStep--;
         updateUI();
+    }
+
+    function resetSession() {
+        if (confirm("Voulez-vous vraiment effacer l'historique et recommencer à zéro ?")) {
+            results = [];
+            currentStep = 0;
+            localStorage.setItem("mw_final_v19", JSON.stringify(results));
+            updateUI();
+        }
     }
 
     function updateUI() {
@@ -142,7 +158,7 @@
 
         if (currentStep === 0) {
             if (delay5 >= 20) {
-                az.innerHTML = "🚨 SIGNAL D'ENTRÉE : MISEZ SUR LE 5";
+                az.innerHTML = "🚨 CIBLE DÉTECTÉE : MISER SUR LE 5";
                 az.classList.add("active-alert");
                 display.innerHTML = `
                     <div class="current-bet">
@@ -154,7 +170,7 @@
             } else {
                 az.innerHTML = "ANALYSE • ATTENTE : " + delay5 + "/20 TOURS";
                 az.classList.remove("active-alert");
-                display.innerHTML = `<div style="color:#444; font-size:20px; font-weight:bold; padding:20px;">OBSERVATION...</div>`;
+                display.innerHTML = `<div style="color:#444; font-size:18px; font-weight:bold; padding:20px;">OBSERVATION...</div>`;
             }
         } else {
             az.innerHTML = "⚠️ RECOVERY EN COURS - TOUR " + currentStep;
@@ -164,12 +180,12 @@
             let nextMise = grilleMise[currentStep + 1] || "LIMITE";
 
             display.innerHTML = `
-                <div class="current-bet">
+                <div class="current-bet" style="display:block; width:100%;">
                     <div class="step-label">Mise Actuelle (Tour ${currentStep})</div>
                     <div class="val-big">${currentMise.toLocaleString()} Ar</div>
                 </div>
-                <div class="next-bet">
-                    <div class="step-label">Prévision Suivante (Tour ${currentStep + 1})</div>
+                <div class="next-bet" style="display:block; width:100%;">
+                    <div class="step-label">Suivant (Tour ${currentStep + 1})</div>
                     <div class="val-small">${nextMise.toLocaleString()} Ar</div>
                 </div>
             `;
